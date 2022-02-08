@@ -8,7 +8,6 @@ server/coverage/lcov-report
 ui/coverage/lcov-report
 ui/coverage/clover.xml
 ui/coverage/coverage-final.json
-package-lock.json
 
 # local env files
 .env.local
