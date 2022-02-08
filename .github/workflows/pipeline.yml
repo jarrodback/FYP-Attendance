@@ -58,7 +58,7 @@ jobs:
     - name: UI - run unit tests    
       run: |
         npm i
-        npm run test:unit
+        npm test
     - uses: actions/upload-artifact@master
       with:
         name: coverage-ui
@@ -69,6 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
 
+    steps:
     - uses: actions/download-artifact@master
       with:
         name: build-server
