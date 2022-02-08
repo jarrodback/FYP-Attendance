@@ -1,0 +1,36 @@
+{
+  "name": "attendance-server",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "set NODE_ENV=dev&& node ./bin/www",
+    "test": "",
+    "test-old": "set NODE_ENV=test&& node ./seeding/seed.js && nyc mocha --recursive --timeout 5000 --exit"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.1",
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
+    "chai-http": "^4.3.0",
+    "cookie-parser": "~1.4.4",
+    "cookie-session": "^2.0.0",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^14.2.0",
+    "eslint": "^8.6.0",
+    "express": "~4.16.1",
+    "http-errors": "^2.0.0",
+    "jshint": "^2.13.3",
+    "jsonwebtoken": "^8.5.1",
+    "mocha": "^9.1.3",
+    "morgan": "~1.9.1",
+    "multer": "^1.4.3",
+    "nodemon": "^2.0.15",
+    "nyc": "^15.1.0",
+    "query-string": "^7.1.0",
+    "sinon": "^12.0.1",
+    "swagger-jsdoc": "^6.1.0",
+    "swagger-ui-express": "^4.3.0"
+  }
+}
