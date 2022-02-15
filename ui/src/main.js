@@ -15,6 +15,8 @@ import VueNotification from "@mathieustan/vue-notification";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
 import "@/assets/css/main.css";
+import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
+import "@fortawesome/fontawesome-free/css/all.css";
 
 /**
  * Configure and enable the packages to use with vue.
