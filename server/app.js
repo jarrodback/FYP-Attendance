@@ -72,6 +72,7 @@ app.use(
 /**
  * Router setup
  */
+var attendanceRouter = require("./routes/attendance.routes");
 
 /**
  * View Engine setup
@@ -87,6 +88,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Configuring the main routes
+app.use("/api/v1", attendanceRouter);
 
 /**
  * Error handling
