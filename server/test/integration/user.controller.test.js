@@ -69,8 +69,9 @@ describe("Testing the /api/v1/user path", () => {
             chai.request(server)
                 .get(`${baseUrl}/${fakeUUID}`)
                 .end((err, res) => {
-                    res.should.have.status(500);
+                    res.should.have.status(400);
                     res.body.should.be.a("object");
+                    res.body.message.should.be.eql("UUID is invalid.");
 
                     done();
                 });

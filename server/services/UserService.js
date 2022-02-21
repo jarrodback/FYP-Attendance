@@ -3,6 +3,8 @@ const model = require("../models/index").user;
 const moduleModel = require("../models/index").module;
 const httpError = require("http-errors");
 const bcrypt = require("bcryptjs");
+const isUUIDv4Valid =
+    require("../middleware/validation/utilities").isUUIDv4Valid;
 
 class UserService {
     /**
@@ -44,6 +46,10 @@ class UserService {
      * @returns {httpError} 404 If no User is found.
      */
     async findUser(user) {
+        if (!isUUIDv4Valid(user)) {
+            throw httpError(400, "UUID is invalid.");
+        }
+
         const query = {
             include: [
                 {
@@ -93,6 +99,10 @@ class UserService {
      * @returns {httpError} 404 If user could not be updated.
      */
     async updateUser(userToUpdate, to_update) {
+        if (!isUUIDv4Valid(userToUpdate)) {
+            throw httpError(400, "UUID is invalid.");
+        }
+
         const query = {
             where: { id: userToUpdate },
         };
@@ -116,6 +126,9 @@ class UserService {
      * @returns {httpError} 404 If user could not be deleted.
      */
     async deleteUser(userToDelete) {
+        if (!isUUIDv4Valid(userToDelete)) {
+            throw httpError(400, "UUID is invalid.");
+        }
         const query = {
             where: {
                 id: userToDelete,
