@@ -1,6 +1,8 @@
 const PostgresService = require("./PostgresService.js");
 const model = require("../models/index").user;
+const moduleModel = require("../models/index").module;
 const httpError = require("http-errors");
+const bcrypt = require("bcryptjs");
 
 class UserService {
     /**
@@ -20,9 +22,134 @@ class UserService {
      * @returns {httpError} 404 If no data is found.
      */
     async findAll(params) {
-        return this.postgresService.findAll(params).catch((error) => {
-            throw httpError(404, error.message);
+        const query = {
+            where: params,
+            include: [
+                {
+                    model: moduleModel,
+                    attributes: ["name"],
+                },
+            ],
+        };
+        return this.postgresService.findAll(query).catch((error) => {
+            throw httpError(500, error.message);
         });
+    }
+
+    /**
+     *  Find a user.
+     *
+     * @param {String} user The user to find
+     * @returns {httpError} 200 If finding the User is successful.
+     * @returns {httpError} 404 If no User is found.
+     */
+    async findUser(user) {
+        const query = {
+            include: [
+                {
+                    model: moduleModel,
+                    attributes: ["name"],
+                },
+            ],
+        };
+        return this.postgresService.findById(user, query).catch((error) => {
+            throw httpError(500, error.message);
+        });
+    }
+
+    /**
+     *  Create a user.
+     *
+     * @param {User} userToCreate The user to create.
+     * @returns {httpError} 200 If creating the User is successful.
+     * @returns {httpError} 404 If creatiing the User is unsuccessful.
+     */
+    async createUser(userToCreate) {
+        if (!validateUser(userToCreate)) {
+            throw httpError(400, "User data is invalid.");
+        }
+        const user = {
+            username: userToCreate.username,
+            email: userToCreate.email,
+            password: bcrypt.hashSync(userToCreate.password, 8),
+            type: userToCreate.type,
+        };
+
+        return this.postgresService.create(user).catch((error) => {
+            if (error.message.includes("username"))
+                throw httpError(400, "Username is already in use.");
+            if (error.message.includes("email"))
+                throw httpError(400, "Email is already in use.");
+            throw httpError(500, error.message);
+        });
+    }
+
+    /**
+     *  Update a user.
+     *
+     * @param {String} userToUpdate The user to update.
+     * @param {Object} to_update The update body.
+     * @returns {httpError} 200 If updating the User is successful.
+     * @returns {httpError} 404 If user could not be updated.
+     */
+    async updateUser(userToUpdate, to_update) {
+        const query = {
+            where: { id: userToUpdate },
+        };
+        return this.postgresService
+            .update(query, to_update)
+            .then((data) => {
+                console.log("Data: ", data);
+                if (data[0] == 0) {
+                    throw httpError(200, "User does not exist.");
+                }
+            })
+            .catch((error) => {
+                throw httpError(404, error.message);
+            });
+    }
+
+    /**
+     *  Delete a user.
+     *
+     * @param {String} userToDelete The user to delete.
+     * @returns {httpError} 200 If deleteing the User is successful.
+     * @returns {httpError} 404 If user could not be deleted.
+     */
+    async deleteUser(userToDelete) {
+        const query = {
+            where: {
+                id: userToDelete,
+            },
+            include: [
+                {
+                    model: moduleModel,
+                    where: { UserId: userToDelete },
+                },
+            ],
+        };
+        return this.postgresService
+            .deleteOne(query)
+            .then((data) => {
+                if (!data) {
+                    throw httpError(400, "User does not exist.");
+                }
+            })
+            .catch((error) => {
+                throw httpError(500, error.message);
+            });
+    }
+
+    /**
+     *  Delete a user.
+     *
+     * @returns {httpError} 200 If deleteing the Users is successful.
+     */
+    async deleteAllUsers() {
+        const query = {
+            where: {},
+        };
+        return this.postgresService.deleteAll(query);
     }
 }
 

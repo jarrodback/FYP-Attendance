@@ -28,10 +28,6 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.ENUM,
                 values: ["Student", "Lecturer"],
             },
-
-            createdAt: Sequelize.DATE,
-
-            updatedAt: Sequelize.DATE,
         },
         { tableName: "Users" }
     );

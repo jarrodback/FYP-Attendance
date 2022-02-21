@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const env = process.env.NODE_ENV || "dev";
+const env = process.env.NODE_ENV || "development";
 const config = require("../database/config")[env];
 
 // Create connection string from config.
@@ -14,9 +14,15 @@ db.sequelize = sequelize;
 db.attendance = require("./attendance.model")(sequelize, Sequelize);
 db.module = require("./module.model")(sequelize, Sequelize);
 db.user = require("./user.model")(sequelize, Sequelize);
+db.moduleUser = require("./moduleUser.model")(sequelize, Sequelize);
 
-// Create associations
-// db.module.hasMany(db.user);
-// db.attendance.belongsTo(db.module);
+db.module.belongsToMany(db.user, {
+    through: db.moduleUser,
+    foreignKey: "ModuleId",
+});
+db.user.belongsToMany(db.module, {
+    through: db.moduleUser,
+    foreignKey: "UserId",
+});
 
 module.exports = db;
