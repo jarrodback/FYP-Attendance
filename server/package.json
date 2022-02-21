@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "start": "set NODE_ENV=development&& node ./database/seeders/seed.js && node ./bin/www",
-    "test": "set NODE_ENV=test&& npm run seedTest && nyc mocha --recursive --timeout 5000 --exit",
-    "seedTest": "set NODE_ENV=test&& npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all --seeders-path ./database/seeders"
+    "test": "set NODE_ENV=test&& node ./database/seeders/seed.js && nyc mocha --recursive --timeout 5000 --exit"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

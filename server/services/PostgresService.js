@@ -30,11 +30,11 @@ class PostgresService {
     /**
      * Create and save the record to the database.
      *
-     * @param {Object} record The Request to create.
+     * @param {Object} record The record to create.
      * @returns {Object} The created record.
      */
-    async create(query) {
-        return this.dataAccess.query(query);
+    async create(record) {
+        return this.model.create(record);
     }
 
     /**

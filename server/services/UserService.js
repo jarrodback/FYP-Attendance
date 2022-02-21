@@ -76,9 +76,9 @@ class UserService {
         };
 
         return this.postgresService.create(user).catch((error) => {
-            if (error.message.includes("username"))
+            if (error.errors[0].message.includes("username"))
                 throw httpError(400, "Username is already in use.");
-            if (error.message.includes("email"))
+            if (error.errors[0].message.includes("email"))
                 throw httpError(400, "Email is already in use.");
             throw httpError(500, error.message);
         });
@@ -99,7 +99,6 @@ class UserService {
         return this.postgresService
             .update(query, to_update)
             .then((data) => {
-                console.log("Data: ", data);
                 if (data[0] == 0) {
                     throw httpError(200, "User does not exist.");
                 }
@@ -150,6 +149,25 @@ class UserService {
             where: {},
         };
         return this.postgresService.deleteAll(query);
+    }
+}
+
+/**
+ *  Validates the data in the User.
+ *
+ * @returns {Boolean} True if the object maps correct to the User model.
+ */
+function validateUser(user) {
+    if (
+        !user ||
+        !user.username ||
+        !user.email ||
+        !user.type ||
+        !user.password
+    ) {
+        return false;
+    } else {
+        return true;
     }
 }
 
