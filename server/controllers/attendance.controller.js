@@ -25,3 +25,22 @@ exports.findAll = (req, res) => {
             });
         });
 };
+
+/**
+ * Create a new Attendance record/
+ * @param {Object} req The request being sent
+ * @param {Object} res The response returned
+ */
+
+exports.create = (req, res) => {
+    attendanceService
+        .createAttendance(req.body)
+        .then(() => {
+            console.log("Attendance has been recorded.");
+        })
+        .catch((err) => {
+            res.status(err.status).send({
+                message: err.message,
+            });
+        });
+};

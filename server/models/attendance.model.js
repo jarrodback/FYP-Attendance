@@ -1,3 +1,5 @@
+const Module = require("./module.model");
+
 module.exports = (sequelize, Sequelize) => {
     const Attendance = sequelize.define(
         "Attendance",
@@ -9,11 +11,6 @@ module.exports = (sequelize, Sequelize) => {
                 primaryKey: true,
             },
 
-            moduleId: {
-                type: Sequelize.UUID,
-                allowNull: false,
-            },
-
             arrivalTime: {
                 type: Sequelize.DATE,
                 allowNull: false,
@@ -23,12 +20,8 @@ module.exports = (sequelize, Sequelize) => {
                 type: Sequelize.DATE,
             },
         },
-        { tableName: "attendance" }
+        { tableName: "Attendance" }
     );
-
-    Attendance.sync({ force: true }).catch(() => {
-        console.log("Attendance model failed to sync with database.");
-    });
 
     return Attendance;
 };

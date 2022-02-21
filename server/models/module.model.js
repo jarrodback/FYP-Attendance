@@ -10,16 +10,12 @@ module.exports = (sequelize, Sequelize) => {
             },
 
             name: {
-                type: Sequelize.TEXT,
+                type: Sequelize.STRING,
                 allowNull: false,
             },
         },
-        { tableName: "module" }
+        { tableName: "Modules" }
     );
-
-    Module.sync({ force: true }).catch(() => {
-        console.log("Module model failed to sync with database.");
-    });
 
     return Module;
 };

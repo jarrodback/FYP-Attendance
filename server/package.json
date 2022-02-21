@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "set NODE_ENV=dev&& node ./bin/www",
-    "test": "",
-    "test-old": "set NODE_ENV=test&& node ./seeding/seed.js && nyc mocha --recursive --timeout 5000 --exit"
+    "test": "set NODE_ENV=test&& npm run seedTest && nyc mocha --recursive --timeout 5000 --exit",
+    "seedTest": "set NODE_ENV=test&& npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all --seeders-path ./database/seeders"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -36,5 +36,8 @@
     "sinon": "^12.0.1",
     "swagger-jsdoc": "^6.1.0",
     "swagger-ui-express": "^4.3.0"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.4.1"
   }
 }

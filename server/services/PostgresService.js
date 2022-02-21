@@ -23,7 +23,8 @@ class PostgresService {
      * @returns {Array[Object]} The found records.
      */
     async findAll(params) {
-        return this.model.findAll(params);
+        console.log("find all with: ", params);
+        return this.model.findAll({ where: params });
     }
 }
 
