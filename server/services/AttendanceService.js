@@ -1,4 +1,5 @@
 const PostgresService = require("./PostgresService.js");
+const model = require("../models/index").attendance;
 const httpError = require("http-errors");
 
 class AttendanceService {
@@ -8,8 +9,7 @@ class AttendanceService {
 
     constructor() {
         // Create an instance of the data layer.
-        this.postgresService = new PostgresService();
-        this.table = "attendance";
+        this.postgresService = new PostgresService(model);
     }
 
     /**
@@ -20,10 +20,7 @@ class AttendanceService {
      * @returns {httpError} 404 If no data is found.
      */
     async findAll(params) {
-        const id = params.orderBy ?? "attendanceId";
-        const query = `SELECT * FROM ${this.table} ORDER BY ${id} ASC`;
-
-        return this.postgresService.findAll(query).catch((error) => {
+        return this.postgresService.findAll(params).catch((error) => {
             throw httpError(404, error.message);
         });
     }

@@ -8,8 +8,12 @@ const createError = require("http-errors");
 const cookieSession = require("cookie-session");
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
-
 require("dotenv").config();
+
+const db = require("./models/index");
+db.sequelize.sync().catch((error) => {
+    console.log("Failed to sync models with database.", error);
+});
 
 var app = express();
 

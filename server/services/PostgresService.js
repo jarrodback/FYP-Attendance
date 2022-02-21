@@ -1,13 +1,10 @@
-const Database = require("../database/config");
-
 class PostgresService {
     /**
      * @description Create an instance of the PostgresService.
      */
 
-    constructor() {
-        // Import and set the pool query variable to access the database.
-        this.dataAccess = Database;
+    constructor(model) {
+        this.model = model;
     }
 
     /**
@@ -25,8 +22,8 @@ class PostgresService {
      *
      * @returns {Array[Object]} The found records.
      */
-    async findAll(query) {
-        return this.dataAccess.query(query);
+    async findAll(params) {
+        return this.model.findAll(params);
     }
 }
 
