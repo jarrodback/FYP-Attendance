@@ -74,6 +74,10 @@ jobs:
         image: postgres
         env:
           POSTGRES_PASSWORD: hallam
+          POSTGRES_DB: attendance-system
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -85,10 +89,7 @@ jobs:
       with:
         name: build-server
 
-    - name: Wait for database to initalise...
-      run: sleep 20s
-
-    - name: Server - run tests   
+    - name: Server - run tests
       run: |
         npm i
         npm test
