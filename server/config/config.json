@@ -1,0 +1,16 @@
+{
+  "development": {
+      "username": "postgres",
+      "password": "hallam",
+      "database": "attendance-system",
+      "host": "localhost",
+      "dialect": "postgres"
+  },
+  "test": {
+      "username": "postgres",
+      "password": "hallam",
+      "database": "attendance-system-testing",
+      "host": "0.0.0.0",
+      "dialect": "postgres"
+  }
+}
