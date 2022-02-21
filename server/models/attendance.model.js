@@ -1,7 +1,5 @@
-const Module = require("./module.model");
-
 module.exports = (sequelize, Sequelize) => {
-    const Attendance = sequelize.define(
+    return sequelize.define(
         "Attendance",
         {
             id: {
@@ -22,6 +20,4 @@ module.exports = (sequelize, Sequelize) => {
         },
         { tableName: "Attendance" }
     );
-
-    return Attendance;
 };

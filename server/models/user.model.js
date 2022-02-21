@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-    const User = sequelize.define(
+    return sequelize.define(
         "User",
         {
             id: {
@@ -33,6 +33,4 @@ module.exports = (sequelize, Sequelize) => {
         },
         { tableName: "Users" }
     );
-
-    return User;
 };

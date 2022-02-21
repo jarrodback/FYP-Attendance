@@ -171,17 +171,7 @@ class UserService {
  * @returns {Boolean} True if the object maps correct to the User model.
  */
 function validateUser(user) {
-    if (
-        !user ||
-        !user.username ||
-        !user.email ||
-        !user.type ||
-        !user.password
-    ) {
-        return false;
-    } else {
-        return true;
-    }
+    return user && user.username && user.email && user.type && user.password;
 }
 
 module.exports = UserService;

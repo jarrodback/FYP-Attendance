@@ -48,17 +48,17 @@ const seedDB = async () => {
         name: "Module 2",
     });
 
-    const moduleuser1 = await db.moduleUser.create({
+    await db.moduleUser.create({
         ModuleId: module1.id,
         UserId: user1.id,
     });
 
-    const moduleuser2 = await db.moduleUser.create({
+    await db.moduleUser.create({
         ModuleId: module1.id,
         UserId: user2.id,
     });
 
-    const moduleuser3 = await db.moduleUser.create({
+    await db.moduleUser.create({
         ModuleId: module2.id,
         UserId: user2.id,
     });
