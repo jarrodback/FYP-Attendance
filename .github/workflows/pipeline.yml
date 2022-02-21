@@ -74,7 +74,7 @@ jobs:
         image: postgres
         env:
           POSTGRES_PASSWORD: hallam
-          POSTGRES_DB: attendance-system
+          POSTGRES_DB: attendance-system-testing
           POSTGRES_USER: postgres
         ports:
           - 5432:5432

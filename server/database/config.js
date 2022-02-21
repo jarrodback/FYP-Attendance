@@ -13,7 +13,7 @@ module.exports = {
         username: "postgres",
         password: "hallam",
         database: "attendance-system-testing",
-        host: "localhost",
+        host: "0.0.0.0",
         dialect: "postres",
         port: 5432,
     },

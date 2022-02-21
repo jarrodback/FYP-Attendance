@@ -1,5 +1,5 @@
 const Sequelize = require("sequelize");
-const env = process.env.NODE_ENV ?? "testing";
+const env = process.env.NODE_ENV ?? "test";
 const config = require("../database/config")[env];
 
 // Create connection string from config.
