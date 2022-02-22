@@ -9,7 +9,9 @@ chai.use(chaiAsPromised);
 describe("Testing isAuthenticated", () => {
     it("isAuthenticated: should be successful", (done) => {
         let res = {
-            send: function () {},
+            send: function () {
+                // This is intentional. For sonar.
+            },
             status: function () {
                 return this;
             },
@@ -31,7 +33,9 @@ describe("Testing isAuthenticated", () => {
 
     it("isAdmin: should be successful", (done) => {
         let res = {
-            send: function () {},
+            send: function () {
+                // This is intentional. For sonar.
+            },
             status: function () {
                 return this;
             },
@@ -53,7 +57,9 @@ describe("Testing isAuthenticated", () => {
 
     it("isAdmin: shouldn't be successful", (done) => {
         let res = {
-            send: function () {},
+            send: function () {
+                // This is intentional. For sonar.
+            },
             status: function () {
                 return this;
             },

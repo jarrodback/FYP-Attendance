@@ -183,7 +183,7 @@ describe("Testing User Service", () => {
         sinon.stub(userService.postgresService, "findAll").resolves([]);
         sinon.stub(userService, "createUser").resolves({});
 
-        const result = userService.getUserGoogleLogin({
+        userService.getUserGoogleLogin({
             email: "email",
             name: { givenName: "test", familyName: "test" },
         });
