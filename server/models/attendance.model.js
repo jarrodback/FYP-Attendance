@@ -17,6 +17,24 @@ module.exports = (sequelize, Sequelize) => {
             departureTime: {
                 type: Sequelize.DATE,
             },
+
+            ModuleId: {
+                type: Sequelize.UUID,
+                allowNull: false,
+                references: {
+                    model: "Modules",
+                    key: "id",
+                },
+            },
+
+            UserId: {
+                type: Sequelize.UUID,
+                allowNull: false,
+                references: {
+                    model: "Users",
+                    key: "id",
+                },
+            },
         },
         { tableName: "Attendance" }
     );

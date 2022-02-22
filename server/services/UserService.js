@@ -1,7 +1,9 @@
 const PostgresService = require("./PostgresService.js");
 const model = require("../models/index").user;
 const moduleModel = require("../models/index").module;
+const moduleUserModel = require("../models/index").moduleUser;
 const httpError = require("http-errors");
+const { attendance } = require("../models/index");
 const isUUIDv4Valid =
     require("../middleware/validation/utilities").isUUIDv4Valid;
 
@@ -16,7 +18,7 @@ class UserService {
     }
 
     /**
-     *  Find all User data
+     * Find all User data
      *
      * @param {String} params The params to search for
      * @returns {httpError} 200 If finding the data is successful.
@@ -38,7 +40,7 @@ class UserService {
     }
 
     /**
-     *  Find a user.
+     * Find a user.
      *
      * @param {String} user The user to find
      * @returns {httpError} 200 If finding the User is successful.
@@ -63,7 +65,7 @@ class UserService {
     }
 
     /**
-     *  Create a user.
+     * Create a user.
      *
      * @param {User} userToCreate The user to create.
      * @returns {httpError} 200 If creating the User is successful.
@@ -89,7 +91,7 @@ class UserService {
     }
 
     /**
-     *  Update a user.
+     * Update a user.
      *
      * @param {String} userToUpdate The user to update.
      * @param {Object} to_update The update body.
@@ -117,7 +119,7 @@ class UserService {
     }
 
     /**
-     *  Delete a user.
+     * Delete a user.
      *
      * @param {String} userToDelete The user to delete.
      * @returns {httpError} 200 If deleteing the User is successful.
@@ -131,27 +133,40 @@ class UserService {
             where: {
                 id: userToDelete,
             },
-            include: [
-                {
-                    model: moduleModel,
-                    where: { UserId: userToDelete },
-                },
-            ],
         };
-        return this.postgresService
-            .deleteOne(query)
-            .then((data) => {
-                if (!data) {
-                    throw httpError(400, "User does not exist.");
-                }
+        return moduleUserModel
+            .destroy({
+                where: {
+                    UserId: userToDelete,
+                },
             })
-            .catch((error) => {
-                throw httpError(500, error.message);
+            .then(() => {
+                return attendance
+                    .destroy({
+                        where: {
+                            UserId: userToDelete,
+                        },
+                    })
+                    .then(() => {
+                        return this.postgresService
+                            .deleteOne(query)
+                            .then((data) => {
+                                if (!data) {
+                                    throw httpError(
+                                        400,
+                                        "User does not exist."
+                                    );
+                                }
+                            })
+                            .catch((error) => {
+                                throw httpError(500, error.message);
+                            });
+                    });
             });
     }
 
     /**
-     *  Delete a user.
+     * Delete a user.
      *
      * @returns {httpError} 200 If deleteing the Users is successful.
      */
@@ -159,9 +174,20 @@ class UserService {
         const query = {
             where: {},
         };
-        return this.postgresService.deleteAll(query);
+        // User module -> Attendance -> User
+        return moduleUserModel.destroy(query).then(() => {
+            return attendance.destroy(query).then(() => {
+                return this.postgresService.deleteAll(query);
+            });
+        });
     }
 
+    /**
+     * Find a user's details with the google auth email.
+     *
+     * @param {Object} user The google user auth object.
+     * @returns {httpError} 200 If finding the Users is successful.
+     */
     async getUserGoogleLogin(user) {
         return this.findAll({ email: user.email })
             .then((data) => {

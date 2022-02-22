@@ -2,6 +2,7 @@ let chai = require("chai");
 let chaiAsPromised = require("chai-as-promised");
 let expect = chai.expect;
 const sinon = require("sinon");
+
 const UserService = require("../../../services/UserService");
 
 chai.use(chaiAsPromised);
@@ -115,16 +116,6 @@ describe("Testing User Service", () => {
             });
     });
 
-    it("deleteUser: should make call to the database", (done) => {
-        const userService = new UserService();
-        userService.postgresService.deleteOne = sinon.stub();
-        userService.deleteUser(userId);
-
-        expect(userService.postgresService.deleteOne.calledOnce).to.be.true;
-
-        done();
-    });
-
     it("deleteUser: shouldn't be successful because of invalid Id", (done) => {
         const invalidUserId = "1234567891221sggs";
         const userService = new UserService();
@@ -144,16 +135,6 @@ describe("Testing User Service", () => {
             .finally(() => {
                 done();
             });
-    });
-
-    it("deleteAllUsers: should make call to the database", (done) => {
-        const userService = new UserService();
-        userService.postgresService.deleteAll = sinon.stub();
-        userService.deleteAllUsers();
-
-        expect(userService.postgresService.deleteAll.calledOnce).to.be.true;
-
-        done();
     });
 
     it("getUserGoogleLogin: should make call to the database and return if user is found", (done) => {
