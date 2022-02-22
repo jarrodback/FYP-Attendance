@@ -9,19 +9,12 @@ let userId;
 let fakeUserId = "46eaed3d-5e8d-49ec-a1f2-7eb6867bdc1b";
 let fakeUUID = "1";
 
-const auth = require("../../middleware/auth/index");
-const isAuthenticatedOriginal = auth.isAuthenticated;
-sinon.stub(auth, "isAuthenticated");
-
-let server = require("../../app");
-
-before(function (done) {
-    auth.isAuthenticated.callsFake((req, res, next) => {
-        next();
-    });
-
-    done();
-});
+// STUB AUTHENTICATION.
+let server = require("./mockAuthentication").server;
+let isAuthenticatedOriginal =
+    require("./mockAuthentication").isAuthenticatedOriginal;
+let isAdminOriginal = require("./mockAuthentication").isAdminOriginal;
+let auth = require("./mockAuthentication").auth;
 
 describe("Testing the /api/v1/user path", () => {
     describe("GET /api/v1/user", () => {
@@ -256,7 +249,7 @@ describe("Testing the /api/v1/user path", () => {
         });
     });
 
-    describe("Testing the /api/v1/user path with invalid permissions", () => {
+    describe("Testing the /api/v1/user path when unauthenticated", () => {
         before(function (done) {
             auth.isAuthenticated.callsFake((req, res, next) => {
                 return isAuthenticatedOriginal(req, res, next);
@@ -348,6 +341,35 @@ describe("Testing the /api/v1/user path", () => {
                     res.body.should.have.a
                         .property("message")
                         .eql("Unauthorized: You are not signed in.");
+
+                    done();
+                });
+        });
+    });
+
+    describe("Testing the /api/v1/user path when unathorized", () => {
+        before(function (done) {
+            auth.isAuthenticated.callsFake((req, res, next) => {
+                next();
+            });
+
+            auth.isAdmin.callsFake((req, res, next) => {
+                return isAdminOriginal(req, res, next);
+            });
+
+            done();
+        });
+
+        it("it should return a 403 when deleteing all users without permissions", (done) => {
+            chai.request(server)
+                .delete(`${baseUrl}`)
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql(
+                            "Unauthorized: You do not have permission to perform this action."
+                        );
 
                     done();
                 });

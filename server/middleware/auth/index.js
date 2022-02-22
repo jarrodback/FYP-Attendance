@@ -36,12 +36,13 @@ const isAuthenticated = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-    if (req.user.type === "Lecturer") {
+    if (req.user && req.user.type === "Lecturer") {
         return next();
     } else {
-        return res
-            .status(403)
-            .send({ message: "Unauthorized: You are not signed in." });
+        return res.status(403).send({
+            message:
+                "Unauthorized: You do not have permission to perform this action.",
+        });
     }
 };
 

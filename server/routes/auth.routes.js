@@ -5,10 +5,9 @@ const passport = require("passport");
 
 // Get the Auth controller
 var authController = require("../controllers/auth.controller");
+const { isAuthenticated } = require("../middleware/auth");
 
-// Find all attendance.
-router.get("/", authController.default);
-
+// Log the user in.
 router.get(
     "/google",
     passport.authenticate("google", { scope: ["email", "profile"] })
@@ -17,12 +16,13 @@ router.get(
 router.get(
     "/google/callback",
     passport.authenticate("google", {
-        successRedirect: "/auth/login",
-        failureRedirect: "/",
+        successRedirect: "/auth/details",
+        failureRedirect: "/auth/",
     })
 );
 
-router.get("/login", authController.login);
+// Get there user's details.
+router.get("/details", isAuthenticated, authController.details);
 
 // Export router.
 module.exports = router;

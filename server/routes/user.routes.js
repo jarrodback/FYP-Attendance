@@ -3,7 +3,7 @@ var router = express.Router();
 
 // Get the User controller
 var userController = require("../controllers/user.controller");
-const { isAuthenticated } = require("../middleware/auth");
+const { isAuthenticated, isAdmin } = require("../middleware/auth");
 
 // Find all users.
 router.get("/", isAuthenticated, userController.findAll);
@@ -21,7 +21,7 @@ router.put("/:id", isAuthenticated, userController.update);
 router.delete("/:id", isAuthenticated, userController.delete);
 
 // Delete all users.
-router.delete("/", isAuthenticated, userController.deleteAll);
+router.delete("/", isAuthenticated, isAdmin, userController.deleteAll);
 
 // Export router.
 module.exports = router;
