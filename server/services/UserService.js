@@ -2,7 +2,6 @@ const PostgresService = require("./PostgresService.js");
 const model = require("../models/index").user;
 const moduleModel = require("../models/index").module;
 const httpError = require("http-errors");
-const { user } = require("../models/index");
 const isUUIDv4Valid =
     require("../middleware/validation/utilities").isUUIDv4Valid;
 
