@@ -1,13 +1,20 @@
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-let server = require("../../app");
 let should = chai.should();
 chai.use(chaiHttp);
+const sinon = require("sinon");
 
 const baseUrl = "/api/v1/user";
 let userId;
 let fakeUserId = "46eaed3d-5e8d-49ec-a1f2-7eb6867bdc1b";
 let fakeUUID = "1";
+
+// STUB AUTHENTICATION.
+let server = require("./mockAuthentication").server;
+let isAuthenticatedOriginal =
+    require("./mockAuthentication").isAuthenticatedOriginal;
+let isAdminOriginal = require("./mockAuthentication").isAdminOriginal;
+let auth = require("./mockAuthentication").auth;
 
 describe("Testing the /api/v1/user path", () => {
     describe("GET /api/v1/user", () => {
@@ -44,7 +51,6 @@ describe("Testing the /api/v1/user path", () => {
                     res.body.should.be.a("object");
                     res.body.username.should.be.eql("username");
                     res.body.email.should.be.eql("email");
-                    res.body.password.should.be.eql("password");
                     res.body.type.should.be.eql("Student");
                     res.body.Modules.should.be.a("array");
                     res.body.Modules[0].name.should.be.eql("Module 1");
@@ -237,6 +243,133 @@ describe("Testing the /api/v1/user path", () => {
                     res.should.have.status(200);
                     res.body.should.be.a("array");
                     res.body.length.should.be.eql(0);
+
+                    done();
+                });
+        });
+    });
+
+    describe("Testing the /api/v1/user path when unauthenticated", () => {
+        before(function (done) {
+            auth.isAuthenticated.callsFake((req, res, next) => {
+                return isAuthenticatedOriginal(req, res, next);
+            });
+
+            done();
+        });
+
+        it("it should return a 401 when getting users", (done) => {
+            chai.request(server)
+                .get(`${baseUrl}?type=Lecturer`)
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql("Unauthorized: You are not signed in.");
+
+                    done();
+                });
+        });
+
+        it("it should return a 401 when getting a user", (done) => {
+            chai.request(server)
+                .get(`${baseUrl}/${userId}`)
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql("Unauthorized: You are not signed in.");
+
+                    done();
+                });
+        });
+
+        it("it should return a 401 when deleteing a user", (done) => {
+            chai.request(server)
+                .delete(`${baseUrl}/${userId}`)
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql("Unauthorized: You are not signed in.");
+
+                    done();
+                });
+        });
+
+        it("it should return a 401 when deleteing all users", (done) => {
+            chai.request(server)
+                .delete(`${baseUrl}`)
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql("Unauthorized: You are not signed in.");
+
+                    done();
+                });
+        });
+
+        it("it should return a 401 when updating a user", (done) => {
+            let to_update = {
+                username: "bob12",
+            };
+            chai.request(server)
+                .put(`${baseUrl}/${fakeUserId}`)
+                .send(to_update)
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql("Unauthorized: You are not signed in.");
+
+                    done();
+                });
+        });
+
+        it("it should return a 401 when creating a user", (done) => {
+            const user = {
+                username: "Test_username",
+                email: "test@email.com",
+                password: "test",
+            };
+            chai.request(server)
+                .post(baseUrl)
+                .send(user)
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql("Unauthorized: You are not signed in.");
+
+                    done();
+                });
+        });
+    });
+
+    describe("Testing the /api/v1/user path when unathorized", () => {
+        before(function (done) {
+            auth.isAuthenticated.callsFake((req, res, next) => {
+                next();
+            });
+
+            auth.isAdmin.callsFake((req, res, next) => {
+                return isAdminOriginal(req, res, next);
+            });
+
+            done();
+        });
+
+        it("it should return a 403 when deleteing all users without permissions", (done) => {
+            chai.request(server)
+                .delete(`${baseUrl}`)
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    res.body.should.have.a
+                        .property("message")
+                        .eql(
+                            "Unauthorized: You do not have permission to perform this action."
+                        );
 
                     done();
                 });

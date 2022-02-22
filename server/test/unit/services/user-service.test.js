@@ -155,4 +155,41 @@ describe("Testing User Service", () => {
 
         done();
     });
+
+    it("getUserGoogleLogin: should make call to the database and return if user is found", (done) => {
+        const userService = new UserService();
+
+        sinon.stub(userService.postgresService, "findAll").resolves({
+            username: "username",
+            email: "email",
+        });
+
+        const result = userService.getUserGoogleLogin({ email: "email" });
+
+        expect(userService.postgresService.findAll.calledOnce).to.be.true;
+        expect(
+            result ==
+                {
+                    username: "username",
+                    email: "email",
+                }
+        );
+
+        done();
+    });
+
+    it("getUserGoogleLogin: should make call to the database and create user if not found", (done) => {
+        const userService = new UserService();
+        sinon.stub(userService.postgresService, "findAll").resolves([]);
+        sinon.stub(userService, "createUser").resolves({});
+
+        userService.getUserGoogleLogin({
+            email: "email",
+            name: { givenName: "test", familyName: "test" },
+        });
+
+        expect(userService.postgresService.findAll.calledOnce).to.be.true;
+
+        done();
+    });
 });
