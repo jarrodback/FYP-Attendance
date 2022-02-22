@@ -2,7 +2,7 @@ const PostgresService = require("./PostgresService.js");
 const model = require("../models/index").user;
 const moduleModel = require("../models/index").module;
 const httpError = require("http-errors");
-const bcrypt = require("bcryptjs");
+const { user } = require("../models/index");
 const isUUIDv4Valid =
     require("../middleware/validation/utilities").isUUIDv4Valid;
 
@@ -77,7 +77,6 @@ class UserService {
         const user = {
             username: userToCreate.username,
             email: userToCreate.email,
-            password: bcrypt.hashSync(userToCreate.password, 8),
             type: userToCreate.type,
         };
 
@@ -163,6 +162,26 @@ class UserService {
         };
         return this.postgresService.deleteAll(query);
     }
+
+    async getUserGoogleLogin(user) {
+        return this.findAll({ email: user.email })
+            .then((data) => {
+                if (data.length == 0) {
+                    const newUser = {
+                        username: `${user.name.givenName} ${user.name.familyName}`,
+                        email: user.email,
+                        type: "Student",
+                    };
+                    return this.createUser(newUser);
+                } else {
+                    // Email is unique so can safely assume index 0 is correct data.
+                    return data[0];
+                }
+            })
+            .catch((error) => {
+                throw httpError(500, error.message);
+            });
+    }
 }
 
 /**
@@ -171,7 +190,7 @@ class UserService {
  * @returns {Boolean} True if the object maps correct to the User model.
  */
 function validateUser(user) {
-    return user && user.username && user.email && user.type && user.password;
+    return user && user.username && user.email && user.type;
 }
 
 module.exports = UserService;

@@ -8,6 +8,7 @@ const createError = require("http-errors");
 const cookieSession = require("cookie-session");
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
+const passport = require("passport");
 require("dotenv").config();
 
 const db = require("./models/index");
@@ -28,6 +29,9 @@ app.use(
         keys: [process.env.TOKEN_SECRET],
     })
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 /**
  * OpenAPI (Swagger) Setup
@@ -78,6 +82,7 @@ app.use(
  */
 var attendanceRouter = require("./routes/attendance.routes");
 var userRouter = require("./routes/user.routes");
+var authRouter = require("./routes/auth.routes");
 
 /**
  * View Engine setup
@@ -95,6 +100,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // Configuring the main routes
 app.use("/api/v1/attendance", attendanceRouter);
 app.use("/api/v1/user", userRouter);
+app.use("/auth", authRouter);
 
 /**
  * Error handling

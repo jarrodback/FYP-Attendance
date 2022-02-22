@@ -1,13 +1,26 @@
 let chai = require("chai");
 let chaiHttp = require("chai-http");
-let server = require("../../app");
 let should = chai.should();
 chai.use(chaiHttp);
+const sinon = require("sinon");
 
 const baseUrl = "/api/v1/user";
 let userId;
 let fakeUserId = "46eaed3d-5e8d-49ec-a1f2-7eb6867bdc1b";
 let fakeUUID = "1";
+
+const auth = require("../../middleware/auth/index");
+const isAuthenticatedStub = sinon.stub(auth, "isAuthenticated");
+
+let server = require("../../app");
+
+before(function (done) {
+    auth.isAuthenticated.callsFake((req, res, next) => {
+        next();
+    });
+
+    done();
+});
 
 describe("Testing the /api/v1/user path", () => {
     describe("GET /api/v1/user", () => {
@@ -44,7 +57,6 @@ describe("Testing the /api/v1/user path", () => {
                     res.body.should.be.a("object");
                     res.body.username.should.be.eql("username");
                     res.body.email.should.be.eql("email");
-                    res.body.password.should.be.eql("password");
                     res.body.type.should.be.eql("Student");
                     res.body.Modules.should.be.a("array");
                     res.body.Modules[0].name.should.be.eql("Module 1");
