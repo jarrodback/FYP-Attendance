@@ -172,11 +172,7 @@ class AttendanceService {
  * @returns {Boolean} True if the object maps correct to the Attendance model.
  */
 function validateAttendance(attendance) {
-    if (!attendance || !attendance.arrivalTime || !attendance.ModuleId) {
-        return false;
-    } else {
-        return true;
-    }
+    return attendance && attendance.arrivalTime && attendance.ModuleId
 }
 
 module.exports = AttendanceService;
