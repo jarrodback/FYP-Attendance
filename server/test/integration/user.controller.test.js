@@ -243,9 +243,11 @@ describe("Testing the /api/v1/user path", () => {
             chai.request(server)
                 .get(`${baseUrl}`)
                 .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.be.a("array");
-                    res.body.length.should.be.eql(0);
+                    setTimeout(function(){
+                        res.should.have.status(200);
+                        res.body.should.be.a("array");
+                        res.body.length.should.be.eql(0);
+                    },500);
 
                     done();
                 });
