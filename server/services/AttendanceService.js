@@ -50,7 +50,6 @@ class AttendanceService {
      * @returns {httpError} 404 If no Attendance is found.
      */
     async findOne(attendance) {
-        console.log("HERE: ", attendance);
         if (!isUUIDv4Valid(attendance)) {
             throw httpError(400, "UUID is invalid.");
         }
