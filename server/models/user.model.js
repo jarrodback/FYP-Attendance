@@ -21,11 +21,6 @@ module.exports = (sequelize, Sequelize) => {
                 unique: true,
             },
 
-            // password: {
-            //     type: Sequelize.STRING,
-            //     allowNull: false,
-            // },
-
             type: {
                 type: Sequelize.ENUM,
                 values: ["Student", "Lecturer"],
