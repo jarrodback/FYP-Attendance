@@ -12,11 +12,11 @@
                 responsive="sm"
             >
 
+                <template #cell(attendanceRating)="data">
+                    {{data.item.attendanceRating}}%
+                </template>
                 <template #cell(onTarget)="data">
-                    <b-form-checkbox
-                        v-model="data.item.onTarget"
-                        @change="test(data)"
-                    >
+                    <b-form-checkbox v-model="data.item.onTarget">
                     </b-form-checkbox>
                 </template>
 
@@ -28,8 +28,14 @@
 /**
  * Component to show the user's modules.
  */
+import { api } from "../middleware/helpers/api";
+
 export default {
     name: "my-modules",
+
+    mounted() {
+        this.getModules();
+    },
 
     computed: {
         /**
@@ -41,7 +47,7 @@ export default {
             return [
                 { key: "name", sortable: true, label: "Module Name" },
                 {
-                    key: "attendanceScore",
+                    key: "attendanceRating",
                     sortable: true,
                     label: "Attendance Rating",
                 },
@@ -53,14 +59,7 @@ export default {
 
     data() {
         return {
-            // List of modules //TODO: Remove hardcoded data
-            modules: [
-                { name: "Module 1", attendanceScore: 40, onTarget: false },
-                { name: "Module 2", attendanceScore: 100, onTarget: true },
-                { name: "Module 3", attendanceScore: 80, onTarget: true },
-                { name: "Module 4", attendanceScore: 10, onTarget: false },
-                { name: "Module 5", attendanceScore: 0, onTarget: false },
-            ],
+            modules: [],
 
             // Default field to sort by.
             sortBy: "attendanceScore",
@@ -71,8 +70,18 @@ export default {
     },
 
     methods: {
-        test(data) {
-            console.log(data);
+        getModules() {
+            api.getUserDetails().then((data) => {
+                this.modules = data.data.Modules;
+
+                // Convert attendance value into percentage.
+                for (let x = 0; x < this.modules.length; x++) {
+                    this.modules[x].attendanceRating =
+                        (this.modules[x].Module_User.attendedSessions /
+                            this.modules[x].numberOfSessions) *
+                        100;
+                }
+            });
         },
     },
 };

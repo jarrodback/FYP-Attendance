@@ -24,7 +24,7 @@ describe("Testing the /api/v1/user path", () => {
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.a("array");
-                    res.body.length.should.be.eql(2);
+                    res.body.length.should.be.eql(3);
                     userId = res.body[0].id;
 
                     done();
@@ -139,26 +139,6 @@ describe("Testing the /api/v1/user path", () => {
                     done();
                 });
         });
-
-        it("it shouldn't create a User with a duplicate username", (done) => {
-            const user = {
-                username: "Test_username",
-                email: "test2@email.com",
-                password: "test",
-                type: "Student",
-            };
-            chai.request(server)
-                .post(baseUrl)
-                .send(user)
-                .end((err, res) => {
-                    res.should.have.status(400);
-                    res.body.message.should.be.eql(
-                        "Username is already in use."
-                    );
-
-                    done();
-                });
-        });
     });
 
     describe("PUT /api/v1/user", () => {
@@ -243,11 +223,11 @@ describe("Testing the /api/v1/user path", () => {
             chai.request(server)
                 .get(`${baseUrl}`)
                 .end((err, res) => {
-                    setTimeout(function(){
+                    setTimeout(function () {
                         res.should.have.status(200);
                         res.body.should.be.a("array");
                         res.body.length.should.be.eql(0);
-                    },500);
+                    }, 500);
 
                     done();
                 });

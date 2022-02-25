@@ -16,6 +16,7 @@ exports.details = async (req, res) => {
         .getUserGoogleLogin(req.user)
         .then((data) => {
             req.userData = data;
+            req.userData.dataValues.google = req.user;
 
             res.send(req.userData);
         })
@@ -33,10 +34,23 @@ exports.details = async (req, res) => {
  */
 exports.logout = async (req, res) => {
     // Clear the user's cookie session.
-    req.user = null;
-    req.userData = null;
+    // req.user = null;
+    // req.userData = null;
+    // req.logOut();
+    // res.clearCookie("connect.sid");
+    // res.clearCookie("attendanceSystem - token");
+    // await req.logout();
+    // res.clearCookie("connect", { path: "/", httpOnly: true });
+    // res.clearCookie("attendanceSystem-token.sig", {
+    //     path: "/",
+    //     httpOnly: true,
+    // });
+    // res.clearCookie("attendanceSystem-token", { path: "/", httpOnly: true });
 
-    res.status(200).send({
-        message: "User was successfully logged out.",
+    req.session.destroy(function (e) {
+        req.logout();
+        res.status(200).send({
+            message: "User was successfully logged out.",
+        });
     });
 };

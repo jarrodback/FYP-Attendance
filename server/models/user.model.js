@@ -12,7 +12,6 @@ module.exports = (sequelize, Sequelize) => {
             username: {
                 type: Sequelize.STRING,
                 allowNull: false,
-                unique: true,
             },
 
             email: {
@@ -24,6 +23,10 @@ module.exports = (sequelize, Sequelize) => {
             type: {
                 type: Sequelize.ENUM,
                 values: ["Student", "Lecturer"],
+            },
+
+            activity: {
+                type: Sequelize.JSON,
             },
         },
         { tableName: "Users" }

@@ -1,6 +1,7 @@
 <template>
     <div id="app">
         <div>
+            <nav-bar></nav-bar>
             <sidebar-menu
                 :menu="menu"
                 :hideToggle="true"
@@ -14,11 +15,13 @@
 
 <script>
 import { SidebarMenu } from "vue-sidebar-menu";
+import NavBar from "@/components/Navbar.vue";
 
 export default {
     name: "App",
     components: {
         SidebarMenu,
+        "nav-bar": NavBar,
     },
 
     data() {

@@ -3,6 +3,7 @@ let chaiAsPromised = require("chai-as-promised");
 let expect = chai.expect;
 const sinon = require("sinon");
 const AttendanceService = require("../../../services/AttendanceService");
+const moduleUserModel = require("../../../models/index").moduleUser;
 
 chai.use(chaiAsPromised);
 
@@ -18,9 +19,10 @@ describe("Testing Attendance Service", () => {
     it("createAttendance: should make call to the database", (done) => {
         const attendanceService = new AttendanceService();
         attendanceService.postgresService.create = sinon.stub();
-        attendanceService.createAttendance(attendance);
+        moduleUserModel.findAll = sinon.stub();
 
-        expect(attendanceService.postgresService.create.calledOnce).to.be.true;
+        attendanceService.createAttendance(attendance);
+        expect(moduleUserModel.findAll.calledOnce).to.be.true;
 
         done();
     });

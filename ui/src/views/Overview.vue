@@ -9,6 +9,7 @@
 
 <script>
 import Modules from "../components/Modules.vue";
+import { store } from "../store/store";
 
 /**
  * View to control what a user views when viewing their requests.
@@ -19,8 +20,11 @@ export default {
     components: {
         "my-modules": Modules,
     },
-    mounted() {
-        console.log("view");
+
+    computed: {
+        getUsername() {
+            return store.getters.user.username;
+        },
     },
 };
 </script>
