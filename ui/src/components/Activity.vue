@@ -3,13 +3,11 @@
         <h2> Activity </h2>
         <div class="overflow-auto center">
             <p
-                v-for="(activity, act) in this.activity"
-                :key="act"
+                v-for="(activity, key) in this.activity"
+                :key="key"
             >
-                <!-- You attended {{activity.module}} at {{new Date(activity.arrivedAt).toISOString().split('T')[0]}} -->
+                {{key}} : {{activity}}
             </p>
-
-            <p> {{this.activity}} </p>
         </div>
     </div>
 </template>
@@ -53,35 +51,68 @@ export default {
                 //         .toISOString()
                 //         .split("T")[0];
                 // }
+                for (let x = userActivity.length - 1; x >= 1; x--) {
+                    console.log(x);
 
-                for (let x = 0; x < userActivity.length; x++) {
-                    const arrivedAt = (userActivity[x].arrivedAt = new Date(
+                    const date = (userActivity[x].arrivedAt = new Date(
                         userActivity[x].arrivedAt
                     ));
 
-                    const date = (userActivity[x].arrivedAt = new Date(
+                    console.log(date);
+                    const datePrev = (userActivity[x - 1].arrivedAt = new Date(
                         userActivity[x].arrivedAt
                     )
                         .toISOString()
                         .split("T")[0]);
 
-                    const hour = arrivedAt.getHours();
-                    const minute = arrivedAt.getMinutes();
-
-                    if (this.activity[date]) {
-                        this.activity[date].push({
-                            module: userActivity[x].module,
-                            arrivedAt: `${hour}:${minute}`,
-                        });
-                    } else {
-                        this.activity[date] = [
+                    if (date == datePrev) {
+                        userActivity[x - 1].modules = [
                             {
                                 module: userActivity[x].module,
-                                arrivedAt: `${hour}:${minute}`,
+                                arrivedAt: userActivity[x].arrivedAt,
+                            },
+                            {
+                                module: userActivity[x - 1].module,
+                                arrivedAt: userActivity[x - 1].arrivedAt,
                             },
                         ];
+
+                        delete userActivity[x];
                     }
                 }
+                console.log(userActivity);
+                // for (let x = 0; x < userActivity.length; x++) {
+                //     const arrivedAt = (userActivity[x].arrivedAt = new Date(
+                //         userActivity[x].arrivedAt
+                //     ));
+
+                //     const date = (userActivity[x].arrivedAt = new Date(
+                //         userActivity[x].arrivedAt
+                //     )
+                //         .toISOString()
+                //         .split("T")[0]);
+
+                //     const hour = arrivedAt.getHours();
+                //     const minute = arrivedAt.getMinutes();
+
+                //     this.activity.push({
+                //         date: date,
+                //     });
+
+                //     // if (this.activity[date]) {
+                //     //     this.activity[date].push({
+                //     //         module: userActivity[x].module,
+                //     //         arrivedAt: `${hour}:${minute}`,
+                //     //     });
+                //     // } else {
+                //     //     this.activity[date] = [
+                //     //         {
+                //     //             module: userActivity[x].module,
+                //     //             arrivedAt: `${hour}:${minute}`,
+                //     //         },
+                //     //     ];
+                //     console.log(this.activity);
+                // }
             });
         },
     },
