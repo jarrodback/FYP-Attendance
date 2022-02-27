@@ -103,8 +103,11 @@ describe("Testing the /api/v1/attendance path", () => {
         });
 
         it("it should create a Attendance", (done) => {
+            let arrivalTime = new Date();
+            arrivalTime.setHours(12);
+            arrivalTime.setMinutes(30);
             const attendance = {
-                arrivalTime: "2022-02-25T12:40:00.2Z",
+                arrivalTime: arrivalTime,
                 UserId: userId,
             };
             chai.request(server)
