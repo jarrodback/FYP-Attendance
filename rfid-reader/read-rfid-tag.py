@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+# Import required packages.
 import RPi.GPIO as GPIO
 import requests
 import signal
@@ -18,19 +19,27 @@ def cleanup(signal,frame):
   GPIO.cleanup()
 
 # Override SIGNIT Ctrl C to run cleanup on exit.
-#signal.signal(signal.SIGINT, cleanup)
+signal.signal(signal.SIGINT, cleanup)
 
 print ("RFID reader initalised. Searching for tags...")
 
+# While reading for tags
 while continue_reading:
+  # Try to read a tag and get data from it.
   try:
     id, text = reader.read()
-    if id and text:
-      print("Card detected: ID:%s, Text:%s" % (id, text))
 
+    # If the tag has an id and text value.
+    if id and text:
+      # Output the value.
+      print("Card detected: ID:%s, Text:%s" % (id, text))
       print("Sending request to server...")
+
+      # Send a request to the server with the value from the tag and the current time.
       data = {'UserID': text, 'arrivalTime': datetime.datetime.now()}  
       response = requests.post("http://192.168.1.33:3050/api/v1/attendance/reader", data=data)
       print (response)
-  finally:
-    GPIO.cleanup()
+      
+  # If unable to read tag, throw exception. 
+  except:
+      print ("An exception occured while reading for tags.")
