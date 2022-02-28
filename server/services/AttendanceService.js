@@ -86,10 +86,6 @@ class AttendanceService {
             throw httpError(400, "Attendance data is invalid.");
         }
 
-        //TODO:
-        //Search through modules and find where time is in the time slot.
-        //Get the module ID, and append it to the attendance record.
-        //Update the user's activity with the time they checked in and the module id.
         let query = {
             where: { UserId: attendance.UserId },
         };
@@ -104,100 +100,122 @@ class AttendanceService {
                 let query = {
                     where: { id: modules },
                 };
-                return moduleModel.findAll(query).then((moduleList) => {
-                    let attendingModule;
-                    for (let x = 0; x < moduleList.length; x++) {
-                        const startTime = new Date(
-                            moduleList[x].dataValues.startTime
-                        );
-                        const endTime = new Date(
-                            moduleList[x].dataValues.endTime
-                        );
-                        const arrivalTime = new Date(attendance.arrivalTime);
-                        const isBetween =
-                            startTime <= arrivalTime && endTime >= arrivalTime;
-
-                        if (isBetween) attendingModule = moduleList[x];
-                    }
-
-                    if (!attendingModule) {
-                        throw httpError(
-                            400,
-                            "The user does not belong to any module at the specified time. Attendance not registered."
-                        );
-                    } else {
+                return this.getUserModuleInformation(query, attendance)
+                    .then((attendingModule) => {
                         const record = {
                             ModuleId: attendingModule.dataValues.id,
                             UserId: attendance.UserId,
                             arrivalTime: attendance.arrivalTime,
                         };
-                        return this.postgresService
-                            .create(record)
-                            .then(() => {
-                                return userModel
-                                    .findByPk(record.UserId)
-                                    .then((data) => {
-                                        let query = {
-                                            where: {
-                                                id: record.UserId,
-                                            },
-                                        };
-                                        let newActivity =
-                                            data.dataValues.activity;
-                                        newActivity.push({
-                                            module: attendingModule.dataValues
-                                                .name,
-                                            attendedAt: record.arrivalTime,
-                                        });
-                                        let to_update = {
-                                            activity: newActivity,
-                                        };
-                                        return userModel
-                                            .update(to_update, query)
-                                            .then(() => {
-                                                let query = {
-                                                    where: {
-                                                        UserId: record.UserId,
-                                                        ModuleId:
-                                                            record.ModuleId,
-                                                    },
-                                                };
-                                                return moduleUserModel
-                                                    .findOne(query)
-                                                    .then((moduleUser) => {
-                                                        let newAttendedSessions =
-                                                            moduleUser.attendedSessions ??
-                                                            0;
-                                                        newAttendedSessions++;
-                                                        let to_update = {
-                                                            attendedSessions:
-                                                                newAttendedSessions,
-                                                        };
 
-                                                        let query = {
-                                                            where: {
-                                                                UserId: record.UserId,
-                                                                ModuleId:
-                                                                    record.ModuleId,
-                                                            },
-                                                        };
-                                                        return moduleUserModel.update(
-                                                            to_update,
-                                                            query
-                                                        );
-                                                    });
-                                            });
-                                    });
-                            })
-                            .catch((error) => {
-                                throw httpError(500, error.message);
+                        return this.postgresService.create(record).then(() => {
+                            this.updateUserActivityAndSession(
+                                record,
+                                attendingModule
+                            ).then(() => {
+                                let query = {
+                                    where: {
+                                        UserId: record.UserId,
+                                        ModuleId: record.ModuleId,
+                                    },
+                                };
+                                return this.findAndUpdateModuleUser(
+                                    query,
+                                    record
+                                );
                             });
-                    }
-                });
+                        });
+                    })
+                    .catch((error) => {
+                        throw httpError(500, error.message);
+                    });
             })
             .catch((error) => {
-                throw httpError(error.status, error.message);
+                throw httpError(error.status || 500, error.message);
             });
+    }
+
+    /**
+     * Find the module that the user is registering to.
+     *
+     * @param {Request} query The query to search the database for.
+     * @param {Request} attendance The attendance data sent from the rfid-reader.
+     * @returns {Promise} The request promise.
+     * @returns {httpError} 400 If no module is found.
+     */
+    async getUserModuleInformation(query, attendance) {
+        return moduleModel.findAll(query).then((moduleList) => {
+            let attendingModule;
+            for (let x = 0; x < moduleList.length; x++) {
+                const startTime = new Date(moduleList[x].dataValues.startTime);
+                const endTime = new Date(moduleList[x].dataValues.endTime);
+                const arrivalTime = new Date(attendance.arrivalTime);
+                const isBetween =
+                    startTime <= arrivalTime && endTime >= arrivalTime;
+
+                if (isBetween) attendingModule = moduleList[x];
+            }
+
+            if (!attendingModule) {
+                throw httpError(
+                    400,
+                    "The user does not belong to any module at the specified time. Attendance not registered."
+                );
+            }
+            return attendingModule;
+        });
+    }
+
+    /**
+     * Find and update the User's activity and session count.
+     *
+     * @param {Request} record The attendance record.
+     * @param {Request} attendingModule The attendance data to register.
+     * @returns {Promise} The request promise.
+     */
+    async updateUserActivityAndSession(record, attendingModule) {
+        return userModel.findByPk(record.UserId).then((data) => {
+            let query = {
+                where: {
+                    id: record.UserId,
+                },
+            };
+            let newActivity = data.dataValues.activity;
+            newActivity.push({
+                module: attendingModule.dataValues.name,
+                attendedAt: record.arrivalTime,
+            });
+            let to_update = {
+                activity: newActivity,
+            };
+            return userModel.update(to_update, query);
+        });
+    }
+
+    /**
+     * Find and update the User's activity and session count.
+     *
+     * @param {Request} query The query to search the database with.
+     * @param {Request} record The attendance record.
+     * @returns {Promise} The request promise.
+     */
+    async findAndUpdateModuleUser(query, record) {
+        return moduleUserModel.findOne(query).then((moduleUser) => {
+            let newAttendedSessions = moduleUser.attendedSessions ?? 0;
+            newAttendedSessions++;
+
+            let to_update = {
+                attendedSessions: newAttendedSessions,
+            };
+
+            let query = {
+                where: {
+                    UserId: record.UserId,
+                    ModuleId: record.ModuleId,
+                },
+            };
+            return moduleUserModel.update(to_update, query);
+        });
     }
 
     /**

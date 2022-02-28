@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2> My Modules </h2>
+        <h3> My Modules </h3>
         <div class="overflow-auto center">
             <b-table
                 id="module-table"
@@ -14,10 +14,6 @@
 
                 <template #cell(attendanceRating)="data">
                     {{data.item.attendanceRating}}%
-                </template>
-                <template #cell(onTarget)="data">
-                    <b-form-checkbox v-model="data.item.onTarget">
-                    </b-form-checkbox>
                 </template>
 
             </b-table>
@@ -51,8 +47,6 @@ export default {
                     sortable: true,
                     label: "Attendance Rating",
                 },
-                { key: "onTarget", label: "On Target" },
-                "Actions",
             ];
         },
     },
@@ -86,3 +80,8 @@ export default {
     },
 };
 </script>
+<style>
+h3 {
+    text-align: left;
+}
+</style>

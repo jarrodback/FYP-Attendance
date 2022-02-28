@@ -16,7 +16,7 @@
 <script>
 import { SidebarMenu } from "vue-sidebar-menu";
 import NavBar from "@/components/Navbar.vue";
-
+import { isUserAdmin } from "@/middleware/auth/auth.js";
 export default {
     name: "App",
     components: {
@@ -56,16 +56,19 @@ export default {
                     header: true,
                     title: "Admin",
                     hiddenOnCollapse: false,
+                    hidden: !isUserAdmin(),
                 },
                 {
                     href: "/modules",
                     title: "My Modules",
                     icon: "fa fa-book",
+                    hidden: !isUserAdmin(),
                 },
                 {
                     href: "/checkin",
                     title: "Check-in",
                     icon: "fa fa-calendar-check",
+                    hidden: !isUserAdmin(),
                 },
             ],
         };

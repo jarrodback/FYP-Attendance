@@ -46,12 +46,12 @@ const seedDB = async () => {
     db.user.hasMany(db.attendance);
 
     let startTime = new Date();
-    startTime.setHours(12);
+    startTime.setHours(9);
     startTime.setMinutes(0);
     startTime.setSeconds(0);
 
     let endTime = new Date();
-    endTime.setHours(13);
+    endTime.setHours(18);
     endTime.setMinutes(0);
     endTime.setSeconds(0);
 

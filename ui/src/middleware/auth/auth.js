@@ -10,7 +10,6 @@ export const isAuthenticated = (to, from, next) => {
     } else {
         api.getUserDetails()
             .then((data) => {
-                console.log(data);
                 store.commit("setLoggedIn", true);
                 store.commit("setUser", {
                     id: data.data.id,
@@ -39,6 +38,13 @@ export const isAdmin = (to, from, next) => {
     } else {
         next({ path: "/forbidden" });
     }
+};
+
+/**
+ * Check if the user is an admin.
+ */
+export const isUserAdmin = () => {
+    return store.getters.user.type == "Lecturer";
 };
 
 /**
