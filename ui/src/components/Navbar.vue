@@ -51,7 +51,9 @@ export default {
                 store.commit("setLoggedIn", false);
                 store.commit("setUser", {});
                 sessionStorage.clear();
-                this.$router.push("/overview").catch(() => {});
+                this.$router.push("/overview").catch(() => {
+                    // Complaint for sonar.
+                });
             });
         },
     },

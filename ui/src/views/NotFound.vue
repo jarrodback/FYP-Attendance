@@ -1,12 +1,12 @@
 <template>
-    <center>
+    <div>
         <h1>404: Page Not Found</h1>
         <p>
             You will be redirect in 5 seconds...
         </p><br>
         <p>
             Click <b-link v-on:click="redirect">here</b-link> if you aren't redirected</p>
-    </center>
+    </div>
 </template>
 
 <script>

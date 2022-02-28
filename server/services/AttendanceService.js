@@ -94,10 +94,10 @@ class AttendanceService {
             .findAll(query)
             .then((attendanceList) => {
                 let modules = [];
-                for (let x = 0; x < attendanceList.length; x++) {
-                    modules.push(attendanceList[x].dataValues.ModuleId);
+                for (let module of attendanceList) {
+                    modules.push(module.dataValues.ModuleId);
                 }
-                let query = {
+                query = {
                     where: { id: modules },
                 };
                 return this.getUserModuleInformation(query, attendance)
@@ -113,7 +113,7 @@ class AttendanceService {
                                 record,
                                 attendingModule
                             ).then(() => {
-                                let query = {
+                                query = {
                                     where: {
                                         UserId: record.UserId,
                                         ModuleId: record.ModuleId,
@@ -146,14 +146,14 @@ class AttendanceService {
     async getUserModuleInformation(query, attendance) {
         return moduleModel.findAll(query).then((moduleList) => {
             let attendingModule;
-            for (let x = 0; x < moduleList.length; x++) {
-                const startTime = new Date(moduleList[x].dataValues.startTime);
-                const endTime = new Date(moduleList[x].dataValues.endTime);
+            for (let module of moduleList) {
+                const startTime = new Date(module.dataValues.startTime);
+                const endTime = new Date(module.dataValues.endTime);
                 const arrivalTime = new Date(attendance.arrivalTime);
                 const isBetween =
                     startTime <= arrivalTime && endTime >= arrivalTime;
 
-                if (isBetween) attendingModule = moduleList[x];
+                if (isBetween) attendingModule = module;
             }
 
             if (!attendingModule) {
@@ -208,7 +208,7 @@ class AttendanceService {
                 attendedSessions: newAttendedSessions,
             };
 
-            let query = {
+            query = {
                 where: {
                     UserId: record.UserId,
                     ModuleId: record.ModuleId,
