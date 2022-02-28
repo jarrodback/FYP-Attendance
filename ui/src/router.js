@@ -3,7 +3,7 @@ import Router from "vue-router";
 
 import Overview from "./views/Overview.vue";
 import Activity from "./views/Activity.vue";
-// import NotFound from "./views/NotFound.vue";
+import NotFound from "./views/NotFound.vue";
 import { isAuthenticated } from "./middleware/auth/auth";
 
 // Pass the router into Vue to use.
@@ -37,9 +37,9 @@ export default new Router({
             beforeEnter: isAuthenticated,
         },
         // If a router not specified is entered, show not found page.
-        // {
-        //     path: "/*",
-        //     component: NotFound,
-        // },
+        {
+            path: "/*",
+            component: NotFound,
+        },
     ],
 });

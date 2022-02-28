@@ -23,8 +23,7 @@ export const isAuthenticated = (to, from, next) => {
                 next();
             })
             .catch(() => {
-                // next({ path: "http://localhost:3050/auth/google" });
-                window.location.href = "http://localhost:3050/auth/google";
+                next({ path: "http://localhost:3050/auth/google" });
             });
     }
 };

@@ -70,9 +70,9 @@ export default {
 
                 // Convert attendance value into percentage.
                 for (let module of this.modules) {
-                    this.module.attendanceRating =
-                        (this.module.Module_User.attendedSessions /
-                            this.modules.numberOfSessions) *
+                    module.attendanceRating =
+                        (module.Module_User.attendedSessions /
+                            module.numberOfSessions) *
                         100;
                 }
             });
