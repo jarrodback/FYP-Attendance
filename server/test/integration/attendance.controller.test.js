@@ -6,7 +6,7 @@ const sinon = require("sinon");
 
 const baseUrl = "/api/v1/attendance";
 let attendanceId;
-let userId;
+const userId = "0caf51d2-6648-47ca-bae2-257535cd7f32";
 let moduleId;
 let fakeAttendanceId = "46eaed3d-5e8d-49ec-a1f2-7eb6867bdc1b";
 let fakeUUID = "1";
@@ -54,7 +54,6 @@ describe("Testing the /api/v1/attendance path", () => {
                     res.body.Module.name.should.be.eql("Module 1");
                     res.body.User.username.should.be.eql("username");
                     moduleId = res.body.ModuleId;
-                    userId = res.body.UserId;
 
                     done();
                 });
@@ -104,9 +103,11 @@ describe("Testing the /api/v1/attendance path", () => {
         });
 
         it("it should create a Attendance", (done) => {
+            let arrivalTime = new Date();
+            arrivalTime.setHours(12);
+            arrivalTime.setMinutes(30);
             const attendance = {
-                arrivalTime: new Date(),
-                ModuleId: moduleId,
+                arrivalTime: arrivalTime,
                 UserId: userId,
             };
             chai.request(server)

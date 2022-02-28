@@ -21,6 +21,12 @@ module.exports = (sequelize, Sequelize) => {
                     key: "id",
                 },
             },
+
+            attendedSessions: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                default: 0,
+            },
         },
         { tableName: "Module_User" }
     );

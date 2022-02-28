@@ -30,7 +30,7 @@ class UserService {
             include: [
                 {
                     model: moduleModel,
-                    attributes: ["name"],
+                    attributes: ["name", "numberOfSessions"],
                 },
             ],
         };

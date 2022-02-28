@@ -16,13 +16,22 @@ router.get(
 router.get(
     "/google/callback",
     passport.authenticate("google", {
-        successRedirect: "/auth/details",
         failureRedirect: "/auth/",
-    })
+    }),
+    function (req, res) {
+        let prevSession = req.session;
+        req.session.regenerate((err) => {
+            Object.assign(req.session, prevSession);
+            res.redirect("//localhost:8080/");
+        });
+    }
 );
 
 // Get there user's details.
 router.get("/details", isAuthenticated, authController.details);
+
+// Log the user out.
+router.post("/logout", authController.logout);
 
 // Export router.
 module.exports = router;

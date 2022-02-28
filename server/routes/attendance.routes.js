@@ -13,6 +13,7 @@ router.get("/:id", isAuthenticated, attendanceController.findOne);
 
 // Create an attendance record.
 router.post("/", isAuthenticated, attendanceController.create);
+router.post("/reader", attendanceController.create);
 
 // Update attendance.
 router.put("/:id", isAuthenticated, attendanceController.update);

@@ -2,6 +2,7 @@ const PostgresService = require("./PostgresService.js");
 const model = require("../models/index").attendance;
 const moduleModel = require("../models/index").module;
 const userModel = require("../models/index").user;
+const moduleUserModel = require("../models/index").moduleUser;
 const httpError = require("http-errors");
 const isUUIDv4Valid =
     require("../middleware/validation/utilities").isUUIDv4Valid;
@@ -85,15 +86,135 @@ class AttendanceService {
             throw httpError(400, "Attendance data is invalid.");
         }
 
-        const record = {
-            ModuleId: attendance.ModuleId,
-            UserId: attendance.UserId,
-            arrivalTime: attendance.arrivalTime,
-            departureTime: attendance.departureTime ?? null,
+        let query = {
+            where: { UserId: attendance.UserId },
         };
 
-        return this.postgresService.create(record).catch((error) => {
-            throw httpError(500, error.message);
+        return moduleUserModel
+            .findAll(query)
+            .then((attendanceList) => {
+                let modules = [];
+                for (let module of attendanceList) {
+                    modules.push(module.dataValues.ModuleId);
+                }
+                query = {
+                    where: { id: modules },
+                };
+                return this.getUserModuleInformation(query, attendance)
+                    .then((attendingModule) => {
+                        const record = {
+                            ModuleId: attendingModule.dataValues.id,
+                            UserId: attendance.UserId,
+                            arrivalTime: attendance.arrivalTime,
+                        };
+
+                        return this.postgresService.create(record).then(() => {
+                            this.updateUserActivityAndSession(
+                                record,
+                                attendingModule
+                            ).then(() => {
+                                query = {
+                                    where: {
+                                        UserId: record.UserId,
+                                        ModuleId: record.ModuleId,
+                                    },
+                                };
+                                return this.findAndUpdateModuleUser(
+                                    query,
+                                    record
+                                );
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        throw httpError(500, error.message);
+                    });
+            })
+            .catch((error) => {
+                throw httpError(error.status || 500, error.message);
+            });
+    }
+
+    /**
+     * Find the module that the user is registering to.
+     *
+     * @param {Request} query The query to search the database for.
+     * @param {Request} attendance The attendance data sent from the rfid-reader.
+     * @returns {Promise} The request promise.
+     * @returns {httpError} 400 If no module is found.
+     */
+    async getUserModuleInformation(query, attendance) {
+        return moduleModel.findAll(query).then((moduleList) => {
+            let attendingModule;
+            for (let module of moduleList) {
+                const startTime = new Date(module.dataValues.startTime);
+                const endTime = new Date(module.dataValues.endTime);
+                const arrivalTime = new Date(attendance.arrivalTime);
+                const isBetween =
+                    startTime <= arrivalTime && endTime >= arrivalTime;
+
+                if (isBetween) attendingModule = module;
+            }
+
+            if (!attendingModule) {
+                throw httpError(
+                    400,
+                    "The user does not belong to any module at the specified time. Attendance not registered."
+                );
+            }
+            return attendingModule;
+        });
+    }
+
+    /**
+     * Find and update the User's activity and session count.
+     *
+     * @param {Request} record The attendance record.
+     * @param {Request} attendingModule The attendance data to register.
+     * @returns {Promise} The request promise.
+     */
+    async updateUserActivityAndSession(record, attendingModule) {
+        return userModel.findByPk(record.UserId).then((data) => {
+            let query = {
+                where: {
+                    id: record.UserId,
+                },
+            };
+            let newActivity = data.dataValues.activity;
+            newActivity.push({
+                module: attendingModule.dataValues.name,
+                attendedAt: record.arrivalTime,
+            });
+            let to_update = {
+                activity: newActivity,
+            };
+            return userModel.update(to_update, query);
+        });
+    }
+
+    /**
+     * Find and update the User's activity and session count.
+     *
+     * @param {Request} query The query to search the database with.
+     * @param {Request} record The attendance record.
+     * @returns {Promise} The request promise.
+     */
+    async findAndUpdateModuleUser(query, record) {
+        return moduleUserModel.findOne(query).then((moduleUser) => {
+            let newAttendedSessions = moduleUser.attendedSessions ?? 0;
+            newAttendedSessions++;
+
+            let to_update = {
+                attendedSessions: newAttendedSessions,
+            };
+
+            query = {
+                where: {
+                    UserId: record.UserId,
+                    ModuleId: record.ModuleId,
+                },
+            };
+            return moduleUserModel.update(to_update, query);
         });
     }
 
@@ -172,7 +293,7 @@ class AttendanceService {
  * @returns {Boolean} True if the object maps correct to the Attendance model.
  */
 function validateAttendance(attendance) {
-    return attendance && attendance.arrivalTime && attendance.ModuleId
+    return attendance && attendance.arrivalTime;
 }
 
 module.exports = AttendanceService;
