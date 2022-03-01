@@ -46,14 +46,14 @@ const seedDB = async () => {
     db.user.hasMany(db.attendance);
 
     let startTime = new Date();
-    startTime.setHours(9);
+    startTime.setHours(0);
     startTime.setMinutes(0);
     startTime.setSeconds(0);
 
     let endTime = new Date();
-    endTime.setHours(18);
-    endTime.setMinutes(0);
-    endTime.setSeconds(0);
+    endTime.setHours(23);
+    endTime.setMinutes(59);
+    endTime.setSeconds(59);
 
     const module1 = await db.module.create({
         id: "72d6e07b-4f52-47bc-87d5-0110b9aa8c5c",
@@ -83,6 +83,21 @@ const seedDB = async () => {
         type: "Lecturer",
     });
 
+    let fakeTime = new Date();
+    fakeTime.setMonth(1);
+    fakeTime.setDate(28);
+    let fakeTime2 = new Date();
+    fakeTime2.setMonth(2);
+    fakeTime2.setDate(7);
+    let fakeTime3 = new Date();
+    fakeTime3.setMonth(2);
+    fakeTime3.setDate(14);
+    let fakeTime4 = new Date();
+    fakeTime4.setMonth(2);
+    fakeTime4.setDate(21);
+    let fakeTime5 = new Date();
+    fakeTime5.setMonth(2);
+    fakeTime5.setDate(28);
     const realUser = await db.user.create({
         id: "0caf51d2-6648-47ca-bae2-257535cd7f32",
         username: "JARROD BACK",
@@ -90,12 +105,54 @@ const seedDB = async () => {
         type: "Student",
         activity: [
             {
+                module: module2.name,
+                attendedAt: fakeTime,
+                type: "Missed",
+            },
+            {
                 module: module1.name,
-                arrivedAt: new Date(),
+                attendedAt: new Date(),
+                type: "Attended",
             },
             {
                 module: module2.name,
-                arrivedAt: new Date(),
+                attendedAt: new Date(),
+                type: "Attended",
+            },
+            {
+                module: module2.name,
+                attendedAt: fakeTime2,
+                type: "Missed",
+            },
+            {
+                module: module2.name,
+                attendedAt: fakeTime3,
+                type: "Attended",
+            },
+            {
+                module: module1.name,
+                attendedAt: fakeTime3,
+                type: "Attended",
+            },
+            {
+                module: module1.name,
+                attendedAt: fakeTime4,
+                type: "Missed",
+            },
+            {
+                module: module2.name,
+                attendedAt: fakeTime4,
+                type: "Attended",
+            },
+            {
+                module: module1.name,
+                attendedAt: fakeTime5,
+                type: "Missed",
+            },
+            {
+                module: module2.name,
+                attendedAt: fakeTime5,
+                type: "Attended",
             },
         ],
     });
