@@ -8,6 +8,7 @@ import router from "./router";
 import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
 import VueCompositionAPI from "@vue/composition-api";
 import VueNotification from "@mathieustan/vue-notification";
+import VCalendar from "v-calendar";
 
 /**
  * Import CSS style files.
@@ -40,6 +41,10 @@ Vue.use(VueNotification, {
             darkenOffline: "#ff245f",
         },
     },
+});
+
+Vue.use(VCalendar, {
+    componentPrefix: "vc",
 });
 
 new Vue({

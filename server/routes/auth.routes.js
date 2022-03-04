@@ -21,10 +21,6 @@ router.get(
 
     function (req, res) {
         res.redirect("//localhost:8080/");
-        //     let prevSession = req.session;
-        //     req.session.regenerate((err) => {
-        //         Object.assign(req.session, prevSession);
-        //     });
     }
 );
 

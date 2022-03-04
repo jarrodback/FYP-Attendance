@@ -16,7 +16,8 @@
 <script>
 import { SidebarMenu } from "vue-sidebar-menu";
 import NavBar from "@/components/Navbar.vue";
-import { isUserAdmin } from "@/middleware/auth/auth.js";
+import { store } from "./store/store";
+
 export default {
     name: "App",
     components: {
@@ -36,42 +37,49 @@ export default {
                     header: true,
                     title: "Main",
                     hiddenOnCollapse: false,
+                    hidden: !this.isUserStudent(),
                 },
                 {
                     href: "/overview",
                     title: "Overview",
                     icon: "fa fa-book-open",
+                    hidden: !this.isUserStudent(),
                 },
                 {
                     href: "/analytics",
                     title: "Analytics",
                     icon: "fa fa-chart-pie",
+                    hidden: !this.isUserStudent(),
                 },
                 {
                     href: "/activity",
                     title: "Activity",
                     icon: "fa fa-chart-line",
+                    hidden: !this.isUserStudent(),
                 },
                 {
                     header: true,
                     title: "Admin",
                     hiddenOnCollapse: false,
-                    hidden: !isUserAdmin(),
+                    hidden: !this.isUserAdmin(),
                 },
                 {
                     href: "/modules",
                     title: "My Modules",
                     icon: "fa fa-book",
-                    hidden: !isUserAdmin(),
-                },
-                {
-                    href: "/checkin",
-                    title: "Check-in",
-                    icon: "fa fa-calendar-check",
-                    hidden: !isUserAdmin(),
+                    hidden: !this.isUserAdmin(),
                 },
             ],
         };
+    },
+
+    methods: {
+        isUserAdmin() {
+            return store.getters.user.type == "Lecturer";
+        },
+        isUserStudent() {
+            return store.getters.user.type == "Student";
+        },
     },
 };
 </script>

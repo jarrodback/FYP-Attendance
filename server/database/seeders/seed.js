@@ -98,12 +98,28 @@ const seedDB = async () => {
     let fakeTime5 = new Date();
     fakeTime5.setMonth(2);
     fakeTime5.setDate(28);
+
+    let olderThan30 = new Date();
+    olderThan30.setUTCFullYear(2021, 1, 1);
+    let olderThan302 = new Date();
+    olderThan302.setUTCFullYear(2021, 1, 2);
+
     const realUser = await db.user.create({
         id: "0caf51d2-6648-47ca-bae2-257535cd7f32",
         username: "JARROD BACK",
         email: "b8043407@my.shu.ac.uk",
         type: "Student",
         activity: [
+            {
+                module: module2.name,
+                attendedAt: olderThan30,
+                type: "Missed",
+            },
+            {
+                module: module1.name,
+                attendedAt: olderThan302,
+                type: "Attended",
+            },
             {
                 module: module2.name,
                 attendedAt: fakeTime,
@@ -179,12 +195,14 @@ const seedDB = async () => {
         ModuleId: module1.id,
         UserId: realUser.id,
         attendedSessions: 3,
+        target: 50,
     });
 
     await db.moduleUser.create({
         ModuleId: module2.id,
         UserId: realUser.id,
         attendedSessions: 7,
+        target: 100,
     });
 
     await db.attendance.create({

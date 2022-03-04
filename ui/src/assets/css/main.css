@@ -30,3 +30,16 @@
     display: flex;
     justify-content: center;
 }
+.target{
+    padding: 0px;
+    display: flex;
+    justify-content: left;
+    text-align: center;
+}
+.target-module-text{
+    padding-top: 5px;
+    padding-right: 5px;
+}
+.target-submit{
+    padding:10px;
+}
