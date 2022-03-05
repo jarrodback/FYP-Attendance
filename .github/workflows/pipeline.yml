@@ -132,3 +132,8 @@ jobs:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: "fyp-attendance-system"
         heroku_email: "b8043407@my.shu.ac.uk"
+
+    - name: Disable SSL
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+      run: heroku config:set PGSSLMODE=no-verify  
