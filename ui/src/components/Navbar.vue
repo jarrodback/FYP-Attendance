@@ -49,7 +49,7 @@ export default {
             return store.getters.user.username;
         },
         getPhoto() {
-            return store.getters.user.google.picture;
+            return store.getters.user.google.picture || "";
         },
     },
 
