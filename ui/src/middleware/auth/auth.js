@@ -23,7 +23,12 @@ export const isAuthenticated = (to, from, next) => {
                 next();
             })
             .catch(() => {
-                window.location.href = "http://localhost:3050/auth/google";
+                if (process.env.NODE_ENV == "production") {
+                    window.location.href =
+                        "https://fyp-attendance-system.herokuapp.com//auth/google";
+                } else {
+                    window.location.href = "http://localhost:3050/auth/google";
+                }
             });
     }
 };
