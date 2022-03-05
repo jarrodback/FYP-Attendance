@@ -44,17 +44,17 @@ export default {
             api.getUserDetails().then((result) => {
                 // Group the array by attendedAt field to easily display the activity per day.
                 const activities = result.data.activity.reduce(
-                    (activities, item) => {
+                    (activitiesGroup, item) => {
                         let attendedAtSplit = item.attendedAt;
                         if (item.attendedAt) {
                             attendedAtSplit = new Date(attendedAtSplit)
                                 .toISOString()
                                 .split("T")[0];
                         }
-                        const activity = activities[attendedAtSplit] || [];
+                        const activity = activitiesGroup[attendedAtSplit] || [];
                         activity.push(item);
-                        activities[attendedAtSplit] = activity;
-                        return activities;
+                        activitiesGroup[attendedAtSplit] = activity;
+                        return activitiesGroup;
                     },
                     {}
                 );

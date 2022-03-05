@@ -13,7 +13,7 @@
                     <div
                         v-for="(activity, activityKey) in date"
                         :key="activityKey"
-                    >You <b><span
+                    >You <strong><span
                                 :style="attendedStyle(activity.type)"
                                 v-if='isAttended(activity.type)'
                             >attended</span>
@@ -21,7 +21,7 @@
                                 :style="attendedStyle(activity.type)"
                                 v-if='!isAttended(activity.type)'
                             >missed</span>
-                        </b> <b>{{activity.module}}</b> at {{new Date(activity.attendedAt).toISOString().split('T')[1].split('.')[0]}}</div>
+                        </strong> <strong>{{activity.module}}</strong> at {{new Date(activity.attendedAt).toISOString().split('T')[1].split('.')[0]}}</div>
 
                 </div>
             </div>
@@ -75,17 +75,17 @@ export default {
             api.getUserDetails().then((result) => {
                 // Group the array by attendedAt field to easily display the activity per day.
                 const activities = result.data.activity.reduce(
-                    (activities, item) => {
+                    (activitiesGroup, item) => {
                         let attendedAtSplit = item.attendedAt;
                         if (item.attendedAt) {
                             attendedAtSplit = new Date(attendedAtSplit)
                                 .toISOString()
                                 .split("T")[0];
                         }
-                        const activity = activities[attendedAtSplit] || [];
+                        const activity = activitiesGroup[attendedAtSplit] || [];
                         activity.push(item);
-                        activities[attendedAtSplit] = activity;
-                        return activities;
+                        activitiesGroup[attendedAtSplit] = activity;
+                        return activitiesGroup;
                     },
                     {}
                 );

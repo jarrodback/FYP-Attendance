@@ -113,7 +113,7 @@ export default {
             });
         },
         targetExists(item) {
-            return item.target != null && item.target == true;
+            return item.target != null && item.target;
         },
         openModal() {
             this.$emit("openCreateModal", this.modules);
