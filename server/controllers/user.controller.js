@@ -2,7 +2,7 @@ const UserService = require("../services/UserService.js");
 const userService = new UserService();
 
 /**
- * Find all Attendance data from the database
+ * Find all User data from the database
  * @param {Object} req The request being sent
  * @param {Object} res The response returned
  */
@@ -75,6 +75,42 @@ exports.create = (req, res) => {
 exports.update = (req, res) => {
     userService
         .updateUser(req.params.id, req.body)
+        .then(() => {
+            res.status(200).send({
+                message: "User was successfully updated.",
+            });
+        })
+        .catch((err) => {
+            res.status(err.status).send({ message: err.message });
+        });
+};
+
+/**
+ * Find all Module Users from the database
+ * @param {Object} req The request being sent
+ * @param {Object} res The response returned
+ */
+exports.findModuleUsers = (req, res) => {
+    userService
+        .getModuleUsers(req.params.id)
+        .then((data) => {
+            res.send(data);
+        })
+        .catch((err) => {
+            res.status(err.status).send({
+                message: err.message,
+            });
+        });
+};
+
+/**
+ * Update a User based body sent.
+ * @param {Object} req The user being sent
+ * @param {Object} res The response returned
+ */
+exports.updateModuleUser = (req, res) => {
+    userService
+        .updateModuleUser(req.body)
         .then(() => {
             res.status(200).send({
                 message: "User was successfully updated.",

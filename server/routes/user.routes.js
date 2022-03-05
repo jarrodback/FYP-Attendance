@@ -14,6 +14,12 @@ router.get("/:id", isAuthenticated, userController.findOne);
 // Create user.
 router.post("/", isAuthenticated, userController.create);
 
+// Get all users in the module
+router.get("/module/:id", isAuthenticated, userController.findModuleUsers);
+
+// Update module user
+router.put("/module", isAuthenticated, userController.updateModuleUser);
+
 // Update user.
 router.put("/:id", isAuthenticated, userController.update);
 

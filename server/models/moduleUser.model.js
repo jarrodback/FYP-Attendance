@@ -27,6 +27,10 @@ module.exports = (sequelize, Sequelize) => {
                 allowNull: false,
                 default: 0,
             },
+
+            target: {
+                type: Sequelize.INTEGER,
+            },
         },
         { tableName: "Module_User" }
     );

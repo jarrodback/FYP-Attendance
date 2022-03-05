@@ -14,6 +14,14 @@
                         <!-- Using 'button-content' slot -->
                         <template #button-content>
                             <em>{{getUsername}}</em>
+                            <b-img
+                                :src='getPhoto'
+                                thumbnail
+                                fluid
+                                :width='32'
+                                :height='32'
+                                alt="Responsive image"
+                            ></b-img>
                         </template>
                         <b-dropdown-item
                             href="#"
@@ -39,6 +47,9 @@ export default {
     computed: {
         getUsername() {
             return store.getters.user.username;
+        },
+        getPhoto() {
+            return store.getters.user.google.picture;
         },
     },
 

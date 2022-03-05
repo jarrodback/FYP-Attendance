@@ -106,8 +106,8 @@ class AttendanceService {
                             ModuleId: attendingModule.dataValues.id,
                             UserId: attendance.UserId,
                             arrivalTime: attendance.arrivalTime,
+                            type: "Attended",
                         };
-
                         return this.postgresService.create(record).then(() => {
                             this.updateUserActivityAndSession(
                                 record,
@@ -184,6 +184,7 @@ class AttendanceService {
             newActivity.push({
                 module: attendingModule.dataValues.name,
                 attendedAt: record.arrivalTime,
+                type: record.type,
             });
             let to_update = {
                 activity: newActivity,

@@ -119,6 +119,62 @@ class UserService {
     }
 
     /**
+     * Find users in a module.
+     *
+     * @param {Object} params The params.
+     * @returns {httpError} 200 If updating the User is successful.
+     * @returns {httpError} 404 If user could not be updated.
+     */
+    async getModuleUsers(id) {
+        let query = {
+            where: { ModuleId: id },
+        };
+        return moduleUserModel
+            .findAll(query)
+            .then((data) => {
+                let users = [];
+                data.forEach((user) => {
+                    users.push(user.dataValues.UserId);
+                });
+                query = {
+                    where: { id: users },
+                };
+                return this.postgresService.findAll(query);
+            })
+            .catch((error) => {
+                throw httpError(error.status || 500, error.message);
+            });
+    }
+
+    /**
+     * Update a user's link table.
+     *
+     * @param {String} userToUpdate The user to update.
+     * @param {Object} to_update The update body.
+     * @returns {httpError} 200 If updating the User is successful.
+     * @returns {httpError} 404 If user could not be updated.
+     */
+    async updateModuleUser(body) {
+        const query = {
+            where: { UserId: body.UserId, ModuleId: body.ModuleId },
+        };
+        const to_update = {
+            attendedSessions: body.attendedSessions,
+            target: body.target,
+        };
+        return moduleUserModel
+            .update(to_update, query)
+            .then((data) => {
+                if (data[0] == 0) {
+                    throw httpError(200, "User does not exist.");
+                }
+            })
+            .catch((error) => {
+                throw httpError(error.status || 500, error.message);
+            });
+    }
+
+    /**
      * Delete a user.
      *
      * @param {String} userToDelete The user to delete.

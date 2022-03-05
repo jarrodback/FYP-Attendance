@@ -1,13 +1,43 @@
 <template>
-    <div>
-        <h2> Activity </h2>
-        <div class="overflow-auto center">
-            <p
-                v-for="(activity, key) in this.activity"
-                :key="key"
-            >
-                {{key}} : {{activity}}
-            </p>
+    <div class="container">
+        <div class="activity">
+            <h3>Recent Activity</h3>
+            <div class="activity-content">
+                <div
+                    class="date"
+                    v-for="(date, key) in this.activity"
+                    :key="key"
+                >
+                    <h4>{{key}} - {{new Date(date[0].attendedAt).toString().substring(0,3)}}</h4>
+
+                    <div
+                        v-for="(activity, activityKey) in date"
+                        :key="activityKey"
+                    >You <strong><span
+                                :style="attendedStyle(activity.type)"
+                                v-if='isAttended(activity.type)'
+                            >attended</span>
+                            <span
+                                :style="attendedStyle(activity.type)"
+                                v-if='!isAttended(activity.type)'
+                            >missed</span>
+                        </strong> <strong>{{activity.module}}</strong> at {{new Date(activity.attendedAt).toISOString().split('T')[1].split('.')[0]}}</div>
+
+                </div>
+            </div>
+        </div>
+        <div class="history">
+            <h3>History</h3>
+
+            <b-calendar
+                v-model="value"
+                :date-info-fn="dateClass"
+                :date-disabled-fn="dateDisabled"
+                locale="en"
+                :hide-header='true'
+                :readonly='true'
+                block
+            ></b-calendar>
         </div>
     </div>
 </template>
@@ -35,86 +65,73 @@ export default {
 
             // Sort by descending by default.
             sortDesc: false,
+
+            value: "",
         };
     },
 
     methods: {
         getActivity() {
-            api.getUserDetails().then((data) => {
-                let userActivity = data.data.activity;
+            api.getUserDetails().then((result) => {
+                // Group the array by attendedAt field to easily display the activity per day.
+                const activities = result.data.activity.reduce(
+                    (activitiesGroup, item) => {
+                        let attendedAtSplit = item.attendedAt;
+                        if (item.attendedAt) {
+                            attendedAtSplit = new Date(attendedAtSplit)
+                                .toISOString()
+                                .split("T")[0];
+                        }
+                        const activity = activitiesGroup[attendedAtSplit] || [];
+                        activity.push(item);
+                        activitiesGroup[attendedAtSplit] = activity;
+                        return activitiesGroup;
+                    },
+                    {}
+                );
 
-                // Convert the dates into a readable format.
-                // for (let x = 0; x < userActivity.length; x++) {
-                //     userActivity[x].arrivedAt = new Date(
-                //         userActivity[x].arrivedAt
-                //     )
-                //         .toISOString()
-                //         .split("T")[0];
-                // }
-                for (let x = userActivity.length - 1; x >= 1; x--) {
-                    console.log(x);
-
-                    const date = (userActivity[x].arrivedAt = new Date(
-                        userActivity[x].arrivedAt
-                    ));
-
-                    console.log(date);
-                    const datePrev = (userActivity[x - 1].arrivedAt = new Date(
-                        userActivity[x].arrivedAt
-                    )
-                        .toISOString()
-                        .split("T")[0]);
-
-                    if (date == datePrev) {
-                        userActivity[x - 1].modules = [
-                            {
-                                module: userActivity[x].module,
-                                arrivedAt: userActivity[x].arrivedAt,
-                            },
-                            {
-                                module: userActivity[x - 1].module,
-                                arrivedAt: userActivity[x - 1].arrivedAt,
-                            },
-                        ];
-
-                        delete userActivity[x];
-                    }
-                }
-                console.log(userActivity);
-                // for (let x = 0; x < userActivity.length; x++) {
-                //     const arrivedAt = (userActivity[x].arrivedAt = new Date(
-                //         userActivity[x].arrivedAt
-                //     ));
-
-                //     const date = (userActivity[x].arrivedAt = new Date(
-                //         userActivity[x].arrivedAt
-                //     )
-                //         .toISOString()
-                //         .split("T")[0]);
-
-                //     const hour = arrivedAt.getHours();
-                //     const minute = arrivedAt.getMinutes();
-
-                //     this.activity.push({
-                //         date: date,
-                //     });
-
-                //     // if (this.activity[date]) {
-                //     //     this.activity[date].push({
-                //     //         module: userActivity[x].module,
-                //     //         arrivedAt: `${hour}:${minute}`,
-                //     //     });
-                //     // } else {
-                //     //     this.activity[date] = [
-                //     //         {
-                //     //             module: userActivity[x].module,
-                //     //             arrivedAt: `${hour}:${minute}`,
-                //     //         },
-                //     //     ];
-                //     console.log(this.activity);
-                // }
+                this.activity = activities;
             });
+        },
+
+        dateClass(ymd, date) {
+            const day = new Date(date).toISOString().split("T")[0];
+            if (this.activity[day]) {
+                let missed = false;
+                this.activity[day].forEach((activity) => {
+                    if (activity.type == "Missed") {
+                        missed = true;
+                    }
+                });
+                if (missed) return "table-danger";
+                else return "table-success";
+            }
+            return " ";
+        },
+
+        dateDisabled(ymd, date) {
+            const weekday = date.getDay();
+            const day = date.getDate();
+            return weekday === 0 || weekday === 6 || day === 13;
+        },
+
+        isAttended(type) {
+            return type === "Attended";
+        },
+        attendedStyle(type) {
+            if (type === "Attended") {
+                return {
+                    color: "green",
+                };
+            } else {
+                return { color: "red" };
+            }
         },
     },
 };
 </script>
+<style>
+h3 {
+    text-align: center;
+}
+</style>

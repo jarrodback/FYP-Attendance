@@ -18,12 +18,9 @@ router.get(
     passport.authenticate("google", {
         failureRedirect: "/auth/",
     }),
+
     function (req, res) {
-        let prevSession = req.session;
-        req.session.regenerate((err) => {
-            Object.assign(req.session, prevSession);
-            res.redirect("//localhost:8080/");
-        });
+        res.redirect("//localhost:8080/");
     }
 );
 
