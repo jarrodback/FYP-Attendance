@@ -134,6 +134,7 @@ jobs:
         heroku_email: "b8043407@my.shu.ac.uk"
 
     - name: Disable SSL
-      with:
+      env
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-      run: heroku config:set PGSSLMODE=no-verify  
+      run: |
+        heroku config:set PGSSLMODE=no-verify  
