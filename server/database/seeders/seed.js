@@ -5,7 +5,7 @@ const db = {};
 
 let sequelize;
 // Create connection string from config.
-if (!config.username) {
+if (!config) {
     sequelize = new Sequelize(
         `postgres://kglsfxcrnhwitj:98d2f4f1a2a867acd12f7ba45bdbbfe2b4cb383c879723a73cd936581fd3995f@ec2-52-211-158-144.eu-west-1.compute.amazonaws.com:5432/d4sqigfnv69mna`
     );
