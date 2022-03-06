@@ -3,8 +3,14 @@ import axios from "axios";
 /**
  * Constants that define the API urls.
  */
-const BASE_AUTH_URL = "http://localhost:3050/auth/";
-const BASE_AUTH_USER = "http://localhost:3050/api/v1/user/";
+let baseUrl;
+if (process.env.NODE_ENV == "production") {
+    baseUrl = "https://fyp-attendance-system.herokuapp.com";
+} else {
+    baseUrl = "http://localhost:3050";
+}
+const BASE_AUTH_URL = `${baseUrl}/auth/`;
+const BASE_AUTH_USER = `${baseUrl}/api/v1/user/`;
 
 /**
  * Object that holds every API request.
