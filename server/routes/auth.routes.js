@@ -20,7 +20,11 @@ router.get(
     }),
 
     function (req, res) {
-        res.redirect("//localhost:8080/");
+        if (process.env.NODE_ENV == "production") {
+            res.redirect("https://jarrodback.github.io/FYP-Attendance/");
+        } else {
+            res.redirect("//localhost:8080/");
+        }
     }
 );
 

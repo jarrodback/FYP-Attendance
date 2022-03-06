@@ -2,13 +2,22 @@ require("dotenv").config();
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth2").Strategy;
 
+let callbackURL;
+
+if (process.env.NODE_ENV == "production") {
+    callbackURL =
+        "https://fyp-attendance-system.herokuapp.com/auth/google/callback";
+} else {
+    callbackURL = "http://localhost:3050/auth/google/callback";
+}
+
 passport.use(
     new GoogleStrategy(
         {
             clientID:
                 "717218480104-o8v2nsmhhc8q311fu1ej0ijfqqf0m4e9.apps.googleusercontent.com",
             clientSecret: "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",
-            callbackURL: "http://localhost:3050/auth/google/callback",
+            callbackURL: callbackURL,
             passReqToCallback: true,
         },
         function (request, accessToken, refreshToken, profile, done) {

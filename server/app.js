@@ -18,7 +18,12 @@ db.sequelize.sync().catch((error) => {
 
 var app = express();
 
-app.use(cors({ origin: "http://localhost:8080", credentials: true }));
+app.use(
+    cors({
+        origin: ["http://localhost:8080", "https://jarrodback.github.io"],
+        credentials: true,
+    })
+);
 
 app.use(
     cookieSession({

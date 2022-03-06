@@ -2,10 +2,17 @@ const Sequelize = require("sequelize");
 const env = process.env.NODE_ENV ?? "test";
 const config = require("../database/config")[env];
 
+let sequelize;
 // Create connection string from config.
-const sequelize = new Sequelize(
-    `postgres://${config.username}:${config.password}@${config.host}:${config.port}/${config.database}`
-);
+try {
+    sequelize = new Sequelize(
+        `postgres://${config.username}:${config.password}@${config.host}:${config.port}/${config.database}`
+    );
+} catch (error) {
+    sequelize = new Sequelize(
+        `postgres://kglsfxcrnhwitj:98d2f4f1a2a867acd12f7ba45bdbbfe2b4cb383c879723a73cd936581fd3995f@ec2-52-211-158-144.eu-west-1.compute.amazonaws.com:5432/d4sqigfnv69mna`
+    );
+}
 console.log(`Connected to database (${env}).`);
 // Create database object and save models, ORM to it.
 const db = {};

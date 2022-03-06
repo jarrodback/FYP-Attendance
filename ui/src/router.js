@@ -6,6 +6,7 @@ import Activity from "./views/Activity.vue";
 import Analytics from "./views/Analytics.vue";
 import AdminModules from "./views/AdminModules.vue";
 import NotFound from "./views/NotFound.vue";
+import Privacy from "./views/Privacy.vue";
 import { isAuthenticated } from "./middleware/auth/auth";
 
 // Pass the router into Vue to use.
@@ -49,6 +50,11 @@ export default new Router({
             name: "modules",
             component: AdminModules,
             beforeEnter: isAuthenticated,
+        },
+        {
+            path: "/privacy",
+            name: "privacy",
+            component: Privacy,
         },
         // If a router not specified is entered, show not found page.
         {
