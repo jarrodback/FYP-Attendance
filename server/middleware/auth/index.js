@@ -10,8 +10,6 @@ if (process.env.NODE_ENV == "production") {
 } else {
     callbackURL = "http://localhost:3050/auth/google/callback";
 }
-console.log("Callback: ", callbackURL);
-console.log("process: ", process.env.NODE_ENV);
 
 passport.use(
     new GoogleStrategy(
@@ -19,7 +17,7 @@ passport.use(
             clientID:
                 "717218480104-o8v2nsmhhc8q311fu1ej0ijfqqf0m4e9.apps.googleusercontent.com",
             clientSecret: "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",
-            callbackURL: "http://localhost:3050/auth/google/callback",
+            callbackURL: callbackURL,
             passReqToCallback: true,
         },
         function (request, accessToken, refreshToken, profile, done) {
