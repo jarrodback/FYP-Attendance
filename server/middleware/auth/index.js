@@ -10,6 +10,8 @@ if (process.env.NODE_ENV == "production") {
 } else {
     callbackURL = "http://localhost:3050/auth/google/callback";
 }
+console.log("Callback: ", callbackURL);
+console.log("process: ", process.env.NODE_ENV);
 
 passport.use(
     new GoogleStrategy(
