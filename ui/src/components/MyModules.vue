@@ -47,7 +47,6 @@ export default {
         },
 
         modulesComputed: function () {
-            console.log("RETURN: ", this.modules);
             return this.modules;
         },
     },

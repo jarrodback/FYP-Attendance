@@ -5,8 +5,6 @@ const db = {};
 
 let sequelize;
 // Create connection string from config.
-console.log(config);
-
 try {
     sequelize = new Sequelize(
         `postgres://${config.username}:${config.password}@${config.host}:${config.port}/${config.database}`
