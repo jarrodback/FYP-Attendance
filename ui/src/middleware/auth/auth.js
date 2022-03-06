@@ -25,7 +25,7 @@ export const isAuthenticated = (to, from, next) => {
             .catch(() => {
                 if (process.env.NODE_ENV == "production") {
                     window.location.href =
-                        "https://fyp-attendance-system.herokuapp.com//auth/google";
+                        "https://fyp-attendance-system.herokuapp.com/auth/google";
                 } else {
                     window.location.href = "http://localhost:3050/auth/google";
                 }
