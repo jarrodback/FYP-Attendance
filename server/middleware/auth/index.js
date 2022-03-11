@@ -14,7 +14,7 @@ if (process.env.NODE_ENV == "production") {
 passport.use(
     new GoogleStrategy(
         {
-            // The ID and secret are for demo only. These can be regenerated and are no longer active.
+            // The ID and secret are for showcase only. These have been regenerated and are no longer active.
             clientID:
                 "717218480104-o8v2nsmhhc8q311fu1ej0ijfqqf0m4e9.apps.googleusercontent.com",
             clientSecret: "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",
