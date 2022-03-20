@@ -6,6 +6,8 @@ const moduleUserModel = require("../models/index").moduleUser;
 const httpError = require("http-errors");
 const isUUIDv4Valid =
     require("../middleware/validation/utilities").isUUIDv4Valid;
+const schedule = require("node-schedule");
+const { user } = require("../models/index");
 
 class AttendanceService {
     /**
@@ -15,6 +17,43 @@ class AttendanceService {
     constructor() {
         // Create an instance of the data layer.
         this.postgresService = new PostgresService(model);
+
+        // Minute, hour, day of month, month, day of week
+        const rule = new schedule.RecurrenceRule();
+        rule.minute = 0;
+        rule.hour = 0;
+
+        // At midnight, run function.
+        this.checkSessionJob = schedule.scheduleJob(rule, () => {
+            this.findMissedSessions();
+        });
+    }
+
+    /**
+     * Find all missed sessions for every user.
+     */
+    async findMissedSessions() {
+        return userModel.findAll().then((users) => {
+            let missed = [];
+            users.forEach((user) => {
+                user.activities.forEach((activity) => {
+                    user.modules.forEach((module) => {
+                        if (activity.module != module.name) {
+                            missed.push(module.id);
+                        }
+                    });
+                });
+                if (missed.length > 0) {
+                    for (module in missed) {
+                        this.createAttendance({
+                            userId: user.id,
+                            moduleId: module.id,
+                            type: "Missed",
+                        });
+                    }
+                }
+            });
+        });
     }
 
     /**
@@ -90,49 +129,85 @@ class AttendanceService {
             where: { UserId: attendance.UserId },
         };
 
-        return moduleUserModel
-            .findAll(query)
-            .then((attendanceList) => {
-                let modules = [];
-                for (let module of attendanceList) {
-                    modules.push(module.dataValues.ModuleId);
-                }
-                query = {
-                    where: { id: modules },
-                };
-                return this.getUserModuleInformation(query, attendance)
-                    .then((attendingModule) => {
-                        const record = {
-                            ModuleId: attendingModule.dataValues.id,
-                            UserId: attendance.UserId,
-                            arrivalTime: attendance.arrivalTime,
-                            type: "Attended",
-                        };
-                        return this.postgresService.create(record).then(() => {
-                            this.updateUserActivityAndSession(
-                                record,
-                                attendingModule
-                            ).then(() => {
-                                query = {
-                                    where: {
-                                        UserId: record.UserId,
-                                        ModuleId: record.ModuleId,
-                                    },
-                                };
-                                return this.findAndUpdateModuleUser(
-                                    query,
-                                    record
-                                );
+        return moduleUserModel.findAll(query).then((attendanceList) => {
+            let modules = [];
+            for (let module of attendanceList) {
+                modules.push(module.dataValues.ModuleId);
+            }
+            query = {
+                where: { id: modules },
+            };
+
+            // Get user module information that stores attendance.
+            return this.getUserModuleInformation(query, attendance)
+                .then((attendingModule) => {
+                    const record = {
+                        ModuleId: attendingModule.dataValues.id,
+                        UserId: attendance.UserId,
+                        arrivalTime: attendance.arrivalTime,
+                        type: attendance.type ?? "Attended",
+                    };
+
+                    return userModel
+                        .findByPk(record.UserId)
+                        .then((data) => {
+                            data.dataValues.activity.forEach((activity) => {
+                                if (
+                                    activity.type == "Attended" &&
+                                    activity.module ==
+                                        attendingModule.dataValues.name
+                                ) {
+                                    const newRecord = new Date(
+                                        record.arrivalTime
+                                    );
+                                    const previousRecord = new Date(
+                                        activity.attendedAt
+                                    );
+
+                                    const isSameDay =
+                                        newRecord.getDate() ==
+                                            previousRecord.getDate() &&
+                                        newRecord.getMonth() ==
+                                            previousRecord.getMonth() &&
+                                        newRecord.getFullYear() ==
+                                            previousRecord.getFullYear();
+                                    if (isSameDay) {
+                                        throw httpError(
+                                            500,
+                                            "Already attended."
+                                        );
+                                    }
+                                }
                             });
+
+                            return this.postgresService
+                                .create(record)
+                                .then(() => {
+                                    this.updateUserActivityAndSession(
+                                        record,
+                                        attendingModule
+                                    ).then(() => {
+                                        query = {
+                                            where: {
+                                                UserId: record.UserId,
+                                                ModuleId: record.ModuleId,
+                                            },
+                                        };
+                                        return this.findAndUpdateModuleUser(
+                                            query,
+                                            record
+                                        );
+                                    });
+                                });
+                        })
+                        .catch((error) => {
+                            throw httpError(500, error.message);
                         });
-                    })
-                    .catch((error) => {
-                        throw httpError(500, error.message);
-                    });
-            })
-            .catch((error) => {
-                throw httpError(error.status || 500, error.message);
-            });
+                })
+                .catch((error) => {
+                    throw httpError(error.status || 500, error.message);
+                });
+        });
     }
 
     /**

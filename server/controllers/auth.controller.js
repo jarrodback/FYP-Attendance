@@ -11,20 +11,16 @@ exports.failure = async (req, res) => {
  * @param {Object} res The response returned
  */
 exports.details = async (req, res) => {
-    console.log("Requesting user details..");
     // Find user with that email.
     userService
         .getUserGoogleLogin(req.user)
         .then((data) => {
-            console.log("Found user details", data);
-
             req.userData = data;
             req.userData.dataValues.google = req.user;
 
             res.send(req.userData);
         })
         .catch((err) => {
-            console.log("Unable to locate details", err);
             res.status(err.status).send({
                 message: err.message,
             });

@@ -6,7 +6,7 @@ const httpError = require("http-errors");
 const { attendance } = require("../models/index");
 const isUUIDv4Valid =
     require("../middleware/validation/utilities").isUUIDv4Valid;
-// const schedule = require("node-schedule");
+const schedule = require("node-schedule");
 
 class UserService {
     /**
@@ -17,17 +17,15 @@ class UserService {
         // Create an instance of the data layer.
         this.postgresService = new PostgresService(model);
 
-        // // Minute, hour, day of month, month, day of week
-        // const rule = new schedule.RecurrenceRule();
-        // rule.minute = 12;
-        // rule.hour = 12;
+        // Minute, hour, day of month, month, day of week
+        const rule = new schedule.RecurrenceRule();
+        rule.minute = 12;
+        rule.hour = 12;
 
-        // console.log("@@@@@@@@@Setting up schedule");
-        // // At midnight, run function.
-        // this.checkSessionJob = schedule.scheduleJob(rule, function () {
-        //     console.log("@@@@@@@@@@@@@@@@@@@@@@ scheudle @@@@@@@@@@@@");
-        //     this.findMissedSessions();
-        // });
+        // At midnight, run function.
+        this.checkSessionJob = schedule.scheduleJob(rule, function () {
+            this.findMissedSessions();
+        });
     }
 
     /**

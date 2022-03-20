@@ -133,16 +133,6 @@ const seedDB = async () => {
                 type: "Missed",
             },
             {
-                module: module1.name,
-                attendedAt: new Date(),
-                type: "Attended",
-            },
-            {
-                module: module2.name,
-                attendedAt: new Date(),
-                type: "Attended",
-            },
-            {
                 module: module2.name,
                 attendedAt: fakeTime2,
                 type: "Missed",
