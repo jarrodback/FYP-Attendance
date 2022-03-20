@@ -6,6 +6,7 @@ const httpError = require("http-errors");
 const { attendance } = require("../models/index");
 const isUUIDv4Valid =
     require("../middleware/validation/utilities").isUUIDv4Valid;
+const schedule = require("node-schedule");
 
 class UserService {
     /**
@@ -15,6 +16,16 @@ class UserService {
     constructor() {
         // Create an instance of the data layer.
         this.postgresService = new PostgresService(model);
+
+        // Minute, hour, day of month, month, day of week
+        const rule = new schedule.RecurrenceRule();
+        rule.minute = 12;
+        rule.hour = 12;
+
+        // At midnight, run function.
+        this.checkSessionJob = schedule.scheduleJob(rule, function () {
+            this.findMissedSessions();
+        });
     }
 
     /**
@@ -262,6 +273,13 @@ class UserService {
             .catch((error) => {
                 throw httpError(500, error.message);
             });
+    }
+
+    /**
+     * Find all missed sessions for every user.
+     */
+    async findMissedSessions() {
+        return this.findAll().then((users) => {});
     }
 }
 
